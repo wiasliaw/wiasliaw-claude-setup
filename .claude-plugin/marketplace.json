@@ -1,0 +1,14 @@
+{
+  "name": "wiasliaw-claude-plugins",
+  "description": "Claude Code plugins by wiasliaw",
+  "owner": {
+    "name": "wiasliaw"
+  },
+  "plugins": [
+    {
+      "name": "autoresearch",
+      "description": "Autonomous research framework built on Claude Code. Define a research goal, and AI agents automatically iterate, evaluate, and improve until convergence criteria are met or the budget is exhausted.",
+      "source": "./plugins/autoresearch"
+    }
+  ]
+}

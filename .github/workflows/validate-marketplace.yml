@@ -1,0 +1,22 @@
+name: Validate Marketplace JSON
+
+on:
+  pull_request:
+    paths:
+      - ".claude-plugin/marketplace.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate marketplace.json
+        run: node --experimental-strip-types .github/scripts/validate-marketplace.ts .claude-plugin/marketplace.json
+
+      - name: Check plugins sorted
+        run: node --experimental-strip-types .github/scripts/check-marketplace-sorted.ts
