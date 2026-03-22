@@ -1,1 +1,1 @@
-# wiasliaw-claude
+# wiasliaw-claude-setup
