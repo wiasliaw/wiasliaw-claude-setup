@@ -23,23 +23,15 @@ Use WebSearch liberally. For example:
 - When designing agents -> search for relevant methodologies and patterns
 - When unsure about best practices -> search for documentation and community patterns
 
-## Phase 1: Gather Context
+## Phase 1: Understand the Research Topic
 
-First, scan the current repository to understand the codebase:
+Start from the user's research goal, not the current codebase. The research topic may or may not relate to the files in this directory — do not assume it does.
 
-```bash
-# Get repo structure (top 3 levels, ignore common noise)
-find . -maxdepth 3 -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/venv/*' -not -path '*/__pycache__/*' | head -80
-```
+1. **Ask the user what they want to research.** If they provided arguments, use those as a starting point. Otherwise, ask an open-ended question.
+2. **Use WebSearch to explore the topic.** Look up prior art, existing approaches, relevant papers, benchmarks, and domain-specific best practices. This builds your understanding and gives you concrete material to discuss.
+3. **Brainstorm with the user.** Based on what you found, surface interesting angles, open questions, or approaches worth exploring. Help the user sharpen their research goal from a vague idea into a concrete objective.
 
-Then read key files (README, config files, entry points) to understand:
-- What language/framework is this project using?
-- What does this project do?
-- What are the natural boundaries and components?
-
-After scanning the repo, use **WebSearch** to look up relevant context for the project's domain. This background knowledge will help you ask better questions and make better suggestions in Phase 2.
-
-Present a brief summary of your understanding to the user and confirm it's correct before proceeding.
+Present a brief summary of your understanding of the research topic and confirm it's correct before proceeding to Phase 2.
 
 ## Phase 2: Interactive Design Conversation
 
@@ -85,6 +77,16 @@ Your goal is to cover all of the following TOPICS through natural conversation. 
 - Which agents run sequentially vs. in parallel?
 - How does information flow between agents across rounds?
 - What state persists between rounds? What gets reset?
+
+**Cumulative Research Artifact (`draft.md`)**
+- Every session MUST maintain a cumulative artifact at `$RESEARCH_DIR/draft.md`. This is non-negotiable.
+- `draft.md` is the evolving research document that accumulates findings, analysis, and conclusions across rounds. It is the primary deliverable of the research loop.
+- Discuss with the user:
+  - What should the initial structure of `draft.md` look like for this research?
+  - How should each round update it — append new findings, revise existing sections, or both?
+  - What level of detail should it contain? (e.g., code snippets, data tables, full analysis)
+- The **Loop** section of `program.md` MUST include explicit steps for how agents read from and write to `draft.md` each round.
+- `draft.md` serves as the primary content source for `/autoresearch-report`.
 
 **Convergence & Stopping**
 - When is the research "done"?
@@ -143,13 +145,19 @@ Based on the conversation, generate a `program.md` using ONLY the skeleton below
 
 Every section must be populated from the conversation. No section should contain boilerplate or placeholder text — if a topic was not discussed, go back and discuss it before generating.
 
+**Mandatory requirements for program.md:**
+- **Directory Layout** MUST list `draft.md` as the cumulative research artifact.
+- **Loop** MUST include explicit steps for reading and updating `draft.md` each round.
+- **Setup** MUST include initializing `draft.md` with its agreed-upon structure.
+
 ## Phase 4: Save and Confirm
 
 Save all generated files:
 1. `.autoresearch/<research-id>/program.md`
-2. `.autoresearch/<research-id>/topic.md` (research scope document, if applicable)
-3. One prompt file per agent (names derived from the agent design conversation)
-4. Any tracking files required by the evaluation design
+2. `.autoresearch/<research-id>/draft.md` (cumulative research artifact — initialized with agreed-upon structure)
+3. `.autoresearch/<research-id>/topic.md` (research scope document, if applicable)
+4. One prompt file per agent (names derived from the agent design conversation)
+5. Any tracking files required by the evaluation design
 
 Show the user the complete `program.md` and ask them to review. Address any changes they want.
 

@@ -24,25 +24,30 @@ RESEARCH_DIR=.autoresearch/<research-id>
 
 ## Step 2: Gather Data
 
-Read all available inputs. Not every file will exist — that's fine, work with what's there.
+Read ALL available inputs. You must be thorough — the final report must be fully self-contained, so you need every piece of content now.
 
 ```bash
 # 1. The research program (REQUIRED — this drives report structure)
 cat $RESEARCH_DIR/program.md
 
-# 2. Results tracking
+# 2. The cumulative research artifact (REQUIRED — this is the primary content source)
+cat $RESEARCH_DIR/draft.md
+
+# 3. Results tracking
 cat $RESEARCH_DIR/results.tsv
 
-# 3. Git history for this session
+# 4. Git history for this session
 git log --oneline autoresearch/<research-id> 2>/dev/null || git log --oneline --grep="autoresearch(<research-id>)" 2>/dev/null
 
-# 4. Round directories
+# 5. Round directories — list all
 ls -d $RESEARCH_DIR/rounds/round-* 2>/dev/null
 ```
 
-For each round directory that exists, read the evaluation feedback files to understand progression — which issues were raised, resolved, or persisted across rounds.
+For each round directory that exists, read **every file** inside it — evaluation feedback, agent outputs, intermediate artifacts, all of it. You need the complete picture to write a comprehensive report.
 
 Also read `rounds/feedback-summary.md` if it exists, for the cumulative view.
+
+**Do not skip any files.** The report must synthesize ALL research outputs into a single self-contained document.
 
 ## Step 3: Analyze program.md
 
@@ -58,73 +63,88 @@ Take note of which concepts are present — these will determine which additiona
 
 ## Step 4: Write the Report
 
-Write the report to `$RESEARCH_DIR/report-final.md`. Adapt depth and emphasis based on actual data — a session with 3 rounds gets a concise report; a session with 12 rounds gets a detailed one.
+Write the report to `$RESEARCH_DIR/report-final.md`.
 
-### Minimal Skeleton (ALWAYS include these sections)
+**This report must be a single, self-contained document.** A reader with no access to the research session files must be able to understand the full research content, findings, and methodology from this report alone. No links to other `.md` files. No "see file X for details." Everything must be inlined.
 
-Every report MUST have these six sections, regardless of what program.md defines:
+### Report Structure
+
+The report has two parts: **Research Content** (the substance) and **Research Process** (how it evolved). Research content comes first and takes up the majority of the report.
 
 ~~~markdown
 # Research Report: <research-id>
 
 **Generated**: <timestamp>
-**Session**: <branch name or research-id>
+**Session**: <research-id>
 **Total Rounds**: <N>
 **Final Score**: <score> (metric: <metric name from program.md>)
-**Baseline Score**: <score> -> **Best Score**: <score> (<improvement summary>)
+**Baseline Score**: <score> → **Best Score**: <score> (<improvement summary>)
 
 ---
 
 ## Executive Summary
 
-<2-3 paragraph summary: what was the research goal (from program.md Objective), what were the major discoveries, how did quality evolve across rounds, what is the overall outcome.>
+<2-3 paragraph summary: what was the research goal, what were the major discoveries, what is the overall outcome and conclusion.>
 
-## Progress Timeline
+---
 
-| Round | Score | Status | Notes |
-|-------|-------|--------|-------|
-| 1 | <score> | baseline | |
-| 2 | <score> | improved/plateau | |
+## Part I: Research Content
+
+<This is the core of the report. Synthesize the final state of `draft.md` and all round outputs into polished, publishable research content. This is NOT a summary of draft.md — it IS the research, refined and structured for a reader.>
+
+<Organize into logical sections derived from the research topic. Use whatever headings, subheadings, and structure best present the findings. Examples:>
+
+<For a code audit: sections by audit category, each with detailed findings, severity, evidence, and recommendations.>
+<For an optimization study: sections by approach tried, parameter analysis, performance results with data.>
+<For a literature synthesis: sections by theme, with detailed analysis and cross-references.>
+
+<Include all substantive content — code snippets, data tables, analysis, examples, evidence. Do not summarize what could be stated in full. If draft.md contains a detailed finding, the report contains that finding in full, polished form.>
+
+---
+
+## Part II: Research Process
+
+### Progress Timeline
+
+| Round | Score | Status | Key Changes |
+|-------|-------|--------|-------------|
+| 1 | <score> | baseline | <what happened> |
+| 2 | <score> | improved/plateau | <what changed> |
 | ... | | | |
 
-<Brief analysis of the trajectory: where did the biggest improvements happen, were there any regressions or plateaus, what caused them.>
+<Analysis of the trajectory: where did the biggest improvements happen, were there regressions or plateaus, what caused them.>
 
-## Key Findings
+### Methodology
 
-<Organize findings by whatever grouping makes sense for this session — pull from evaluation feedback and the final report. Each finding should note which round(s) it emerged in and why it matters.>
+<Describe the research methodology: what agents were used, how rounds worked, what evaluation criteria were applied. Inline this fully — do not reference program.md or any other file.>
 
-## What Didn't Work
+### What Didn't Work
 
-<Summarize failed approaches — issues that persisted across multiple rounds despite revision attempts.>
+<Failed approaches across rounds. Each entry explains what was tried and why it didn't resolve.>
 
-- **<issue>** [rounds <list>]: <what was tried and why it didn't resolve>
-- ...
+### Recommendations
 
-## Recommendations
-
-<Based on the session's trajectory, what should a follow-up session focus on? What issues remain open? What approaches showed promise but weren't fully explored?>
-
-## Raw Data
-
-- Full results: `<RESEARCH_DIR>/results.tsv`
-- Round feedback: `<RESEARCH_DIR>/rounds/round-{N}/`
-- Feedback summary: `<RESEARCH_DIR>/rounds/feedback-summary.md`
-- Git history: `git log autoresearch/<research-id>`
+<What should follow-up research focus on? What issues remain open? What showed promise but wasn't fully explored?>
 ~~~
 
 ### Additional Sections (derived from program.md)
 
-After writing the minimal skeleton, review program.md and add extra sections ONLY for concepts the session actually defined and used. Examples of what to look for and the corresponding section to add:
+After writing the above, review program.md and add extra sections ONLY for concepts the session actually used:
 
-- **If program.md defines depth levels / progressive scope** -> Add a section showing when each level was unlocked/converged, rounds spent per level, and issues per level.
-- **If program.md defines a persistent learner agent** -> Add a section tracking knowledge accumulation across rounds — what was learned early, what took longer, any regressions.
-- **If program.md defines optimization with parameters** -> Add a section showing parameter exploration history, which configurations were tried, and which performed best.
-- **If program.md defines multiple quality dimensions with weights** -> Add a section breaking down scores by dimension over time.
-- **If program.md defines specific agent roles beyond a simple loop** -> Add a section analyzing each agent's contribution and effectiveness.
+- **Depth levels / progressive scope** → section showing level progression, rounds per level, issues per level
+- **Persistent learner agent** → section on knowledge accumulation across rounds
+- **Optimization with parameters** → section on parameter exploration and best configurations
+- **Multiple quality dimensions** → section breaking down scores by dimension over time
+- **Multiple agent roles** → section analyzing each agent's contribution
 
-**Do not add sections for concepts that program.md didn't define.** The report should reflect the actual session, not a generic template. If program.md uses a simple score with no depth levels, there is no depth section. If there is no persistent learner, there is no learner growth section.
+Do not add sections for concepts that program.md didn't define. Derive structure from actual data.
 
-For each additional section you add, derive its structure from the data that actually exists — don't invent column headers for data that wasn't tracked.
+### Critical Rules for Report Quality
+
+- **No external file references.** Do not link to or reference other `.md` files, `.tsv` files, or directories. All content must be inlined in this document.
+- **Research content first.** Part I (Research Content) is the primary value of this report. Part II (Research Process) is supplementary context.
+- **Full detail, not summaries.** If the research produced detailed findings, include them in full. Do not condense 10 findings into 3 bullet points.
+- **Publishable quality.** Write as if this document will be read by someone unfamiliar with the AutoResearch framework. No jargon about "rounds", "agents", or "draft.md" in Part I — use natural research language.
 
 ## Step 5: Save and Confirm
 

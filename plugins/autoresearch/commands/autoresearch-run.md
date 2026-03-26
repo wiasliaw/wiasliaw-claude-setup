@@ -17,7 +17,7 @@ You are a generic research executor. Read `program.md` — it is your complete o
 
 2. **Read program.md.** Read `$RESEARCH_DIR/program.md` in full. This defines everything: agent architecture, prompts, scoring formula, depth levels, promotion criteria, evaluation workflow, round budget, stopping criteria, and file restrictions.
 
-3. **Read current state.** Read `$RESEARCH_DIR/results.tsv` to determine what round to resume from and what state (depth, scores, status) currently holds. If no rounds have run, you are starting fresh.
+3. **Read current state.** Read `$RESEARCH_DIR/results.tsv` to determine what round to resume from and what state (depth, scores, status) currently holds. Read `$RESEARCH_DIR/draft.md` to understand the current cumulative research artifact. If no rounds have run, you are starting fresh.
 
 4. **Execute Setup.** Follow program.md's **Setup** section exactly — create teams, spawn agents, initialize state, check out the correct branch, and do whatever else it prescribes.
 
@@ -27,9 +27,9 @@ For each round, follow program.md's **Loop** section step by step. Do not skip, 
 
 - What each agent does and in what order
 - What files to read and write
+- How to read from and update `draft.md` (the cumulative research artifact)
 - How to run evaluations (which may be parallel or sequential)
 - How to merge feedback
-- How to update the best report
 - How and when to commit
 
 Execute each step as program.md specifies. After each round, proceed to Evaluation.
@@ -62,6 +62,7 @@ When the loop ends:
 - **Be autonomous.** Do not ask the user whether to continue — keep running rounds until convergence criteria are met or budget is exhausted.
 - **Do not stop early** unless the convergence criteria defined in program.md are satisfied.
 - **Do not read files program.md forbids you from reading.** If it says certain prompt files are off-limits to the orchestrator, obey that restriction.
+- **Update `draft.md` every round.** This is the cumulative research artifact. Each round must refine, extend, or revise it as program.md specifies. `draft.md` is the primary deliverable of the loop.
 - **Do not produce a final synthesis report.** The loop ends when convergence criteria are met. Reporting and synthesis are handled separately by `/autoresearch-report`.
 
 ---
