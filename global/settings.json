@@ -43,19 +43,7 @@
     ]
   },
   "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": true,
-    "failIfUnavailable": true,
-    "allowUnsandboxedCommands": false,
-    "excludedCommands": ["docker"],
-    "filesystem": {
-      "denyRead": ["~/.aws/credentials"]
-    },
-    "network": {
-      "allowedDomains": ["github.com", "*.npmjs.org", "registry.yarnpkg.com"],
-      "allowLocalBinding": true
-    },
-    "enableWeakerNetworkIsolation": true
+    "enabled": false
   },
   "worktree": {
     "symlinkDirectories": ["node_modules", ".pnpm-store", "target", ".claude", ".autoresearch"]
