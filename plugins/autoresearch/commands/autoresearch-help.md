@@ -49,6 +49,7 @@ After the conversation, the following files are generated:
 ```text
 .autoresearch/<research-id>/
   program.md          # Research program (complete operating manual)
+  draft.md            # Cumulative research artifact (initialized with agreed-upon structure)
   topic.md            # Research scope document (if applicable)
   <agent-prompts>     # Prompt files for each agent
 ```
@@ -106,6 +107,7 @@ The exact layout is defined by each session's `program.md`. A typical session lo
 .autoresearch/
   <research-id>/
     program.md              # Research program (single source of truth)
+    draft.md                # Cumulative research artifact (updated every round)
     topic.md                # Research scope document (if applicable)
     prompts/                # Agent prompt files
       <agent-name>.md
