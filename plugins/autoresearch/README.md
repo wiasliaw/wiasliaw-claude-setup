@@ -14,15 +14,33 @@ The result is a `program.md` that fully specifies:
 - **Iteration**: round structure, information flow, state management
 - **Convergence**: when the research is "done"
 
-Then `/autoresearch-run` executes the loop autonomously. Finally, `/autoresearch-report` for final report.
+Then `/autoresearch-run` executes the loop autonomously. Finally, `/autoresearch-report` generates a comprehensive report.
 
-### Agent Types
+## Architecture
 
-| Type | Behavior | Best For |
+AutoResearch follows a **command + skill** architecture:
+
+- **Commands** are thin entry points (~15 lines) that dispatch to skills
+- **Skills** contain methodology knowledge, verification gates, and anti-rationalization tables
+- **Supplementary files** provide reference material loaded on-demand (not always in context)
+
+### Skills
+
+| Skill | Purpose |
+|---|---|
+| `using-autoresearch` | Meta-skill: routing and core behaviors across all skills |
+| `research-design` | Methodology for designing research programs (agents, evaluation, convergence) |
+| `research-execution` | Methodology for running autonomous loops with verification gates |
+| `research-reporting` | Methodology for synthesizing self-contained reports |
+
+### Supplementary References
+
+| File | Loaded By | Content |
 |---|---|---|
-| **team-agent** | Persistent across rounds, accumulates context | Tasks requiring memory over time |
-| **sub-agent** | Fresh each round, receives context from orchestrator | Tasks needing fresh perspective |
-| **one-shot (`claude -p`)** | Fully isolated, no tool access | Unbiased evaluation |
+| `agent-types.md` | research-design | Agent type comparison, context-passing strategies |
+| `convergence-patterns.md` | research-design | Stopping condition catalog and selection guide |
+| `evaluation-patterns.md` | research-design | Scoring formulas, evaluator design patterns |
+| `loop-patterns.md` | research-execution | Iteration strategies, feedback flow patterns |
 
 ## Commands
 
@@ -40,8 +58,32 @@ Each research session lives under `.autoresearch/<research-id>/`. The exact layo
 ```text
 .autoresearch/<research-id>/
   program.md              # Research program (single source of truth)
+  draft.md                # Cumulative research artifact (primary deliverable)
   topic.md                # Research scope document
   rounds/                 # Round-by-round data and feedback
   results.tsv             # Score tracking
   report-final.md         # Generated report
+```
+
+## Plugin Structure
+
+```text
+plugins/autoresearch/
+  commands/                           # Thin command dispatchers
+    autoresearch-init.md
+    autoresearch-run.md
+    autoresearch-report.md
+    autoresearch-help.md
+  skills/                             # Methodology and knowledge
+    using-autoresearch/SKILL.md
+    research-design/
+      SKILL.md
+      agent-types.md
+      convergence-patterns.md
+      evaluation-patterns.md
+    research-execution/
+      SKILL.md
+      loop-patterns.md
+    research-reporting/SKILL.md
+  README.md
 ```
