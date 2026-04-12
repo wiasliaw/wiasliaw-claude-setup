@@ -3,6 +3,8 @@ name: test-engineering
 description: Comprehensive test design and execution knowledge. Covers test pyramid, test types (unit, fuzz, invariant, property-based, event trigger), Prove-It pattern, and test quality practices.
 ---
 
+# Test Engineering
+
 ## Overview
 
 Tests are proof, not afterthoughts. Every behavior claim must be backed by an executable assertion. This skill covers both **test strategy design** (deciding what and how to test) and **execution discipline** (writing tests that actually catch bugs).

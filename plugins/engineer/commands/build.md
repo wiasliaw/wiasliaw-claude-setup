@@ -5,7 +5,7 @@ description: Execute an implementation plan step by step — following the incre
 
 # Build — Execute Implementation Plan
 
-Using engineer:build to execute the implementation plan.
+Announce: "Using engineer:build to execute the implementation plan."
 
 ## 1. Load Engineering Discipline
 

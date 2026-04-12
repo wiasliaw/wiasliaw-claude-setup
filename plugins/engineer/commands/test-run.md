@@ -5,7 +5,7 @@ description: Write and execute tests according to the test strategy — followin
 
 # Test Run — Write and Execute Tests
 
-Using engineer:test-run to write and execute tests.
+Announce: "Using engineer:test-run to write and execute tests."
 
 ## 1. Load Test Engineering Knowledge
 
@@ -14,7 +14,7 @@ Read `skills/test-engineering/SKILL.md` and internalize the test quality rules, 
 ## 2. Find Test Strategy
 
 - If `$ARGUMENTS` specifies a strategy file, read that file directly.
-- Otherwise, search `docs/plans/` and the project root for recent test strategy documents (e.g., `test-strategy.md`, `test-plan.md`).
+- Otherwise, search `docs/`, `docs/plans/`, and the project root for recent test strategy documents (e.g., `docs/test-strategy-<scope>.md`, `test-strategy.md`, `test-plan.md`).
 - If no strategy exists, tell the user:
   > No test strategy found. Run `/test:plan` first to generate one, or pass a strategy file as an argument.
 

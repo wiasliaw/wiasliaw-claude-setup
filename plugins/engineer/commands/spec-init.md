@@ -9,7 +9,7 @@ Announce: "Using engineer:spec-init to initialize OpenSpec."
 
 ## Step 1: Load Skill
 
-Read `skills/openspec-workflow/SKILL.md` from this plugin directory for reference knowledge about OpenSpec concepts and CLI usage. Internalize the content — do not summarize it to the user.
+Read `skills/openspec-workflow/SKILL.md` for reference knowledge about OpenSpec concepts and CLI usage. Internalize the content — do not summarize it to the user.
 
 ## Step 2: Check Prerequisites
 

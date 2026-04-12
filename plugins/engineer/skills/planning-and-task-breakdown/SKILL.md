@@ -148,23 +148,20 @@ Each task step is one discrete action taking 2-5 minutes.
 - Test: `tests/exact/path/to/test.py`
 
 **Step 1: Write the failing test**
-```python
-# tests/exact/path/to/test.py
-def test_component_does_expected_thing():
-    result = component.do_thing(input)
-    assert result == expected
-`` `
+    # tests/exact/path/to/test.py
+    def test_component_does_expected_thing():
+        result = component.do_thing(input)
+        assert result == expected
 
 **Step 2: Run test to verify it fails**
 Run: `pytest tests/exact/path/to/test.py::test_component_does_expected_thing -v`
 Expected: FAIL with "AttributeError: module has no attribute 'do_thing'"
 
 **Step 3: Write minimal implementation**
-```python
-# exact/path/to/file.py
-def do_thing(input):
-    return expected
-`` `
+
+    # exact/path/to/file.py
+    def do_thing(input):
+        return expected
 
 **Step 4: Run test to verify it passes**
 Run: `pytest tests/exact/path/to/test.py::test_component_does_expected_thing -v`
@@ -172,9 +169,6 @@ Expected: PASS
 
 **Step 5: Commit**
 Run: `git add -A && git commit -m "feat(component): add do_thing"`
-```
-
-> **Note:** Escape in the template above is for display only. In actual plans, use real fenced code blocks.
 
 ---
 
@@ -246,6 +240,10 @@ After saving the plan document, present these options to the user:
 1. **Subagent-driven (this session)** — Hand off to `superpowers:subagent-driven-development`. Best when tasks have shared state or you want oversight within the current session.
 
 2. **Parallel session** — Hand off to `superpowers:executing-plans`. Best when the plan is self-contained and can run independently with review checkpoints.
+
+3. **Manual execution** — If the Superpowers plugin is not installed, execute the plan manually step by step, following the increment cycle from the `incremental-implementation` skill.
+
+> **Note:** Options 1 and 2 require the [Superpowers plugin](https://github.com/nichochar/claude-superpowers). If unavailable, use option 3.
 
 State clearly which option you recommend and why, based on:
 - Number of tasks (>10 favors parallel)

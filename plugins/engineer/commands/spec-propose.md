@@ -25,7 +25,13 @@ Verify OpenSpec is initialized by checking for an `openspec/` directory in the p
 
 ## Execute OpenSpec Propose
 
-Guide the user to run `/opsx:propose $ARGUMENTS` (or the resolved change description).
+Run OpenSpec propose via Bash:
+
+```bash
+openspec propose "<change-description>"
+```
+
+Where `<change-description>` is the resolved input from the user or `$ARGUMENTS`.
 
 OpenSpec will generate the following artifacts under `openspec/changes/<change-name>/`:
 

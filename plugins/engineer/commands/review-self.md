@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
 description: Self-review current changes before merge — five-axis review with severity-labeled findings and auto-fixes
 ---
 

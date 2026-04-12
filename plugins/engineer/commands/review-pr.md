@@ -3,13 +3,13 @@ allowed-tools: Bash, Read, Glob, Grep, WebFetch, WebSearch
 description: Review an existing PR or branch diff — five-axis review producing severity-labeled findings suitable for PR comments
 ---
 
-Say: "Using engineer:review-pr to review the PR."
+Announce: "Using engineer:review-pr to review the PR."
 
 This is a READ-ONLY review. Do NOT modify any files.
 
 ## Step 1 — Load review knowledge
 
-Read the file `skills/code-review-and-quality/SKILL.md` in this plugin to load review guidelines and quality criteria.
+Read `skills/code-review-and-quality/SKILL.md` to load review guidelines and quality criteria.
 
 ## Step 2 — Identify the PR / diff
 

@@ -3,6 +3,8 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 description: Simplify code for clarity without changing behavior — applying Chesterton's Fence, incremental changes with test verification
 ---
 
+# Code Simplify
+
 Announce: "Using engineer:code-simplify to simplify code."
 
 Read `skills/code-simplification/SKILL.md` to load simplification knowledge before proceeding.

@@ -28,6 +28,7 @@ Determine the scope of the test strategy:
 
 - If `$ARGUMENTS` specifies a scope (file, module, feature, PR), focus analysis on that scope.
 - If `$ARGUMENTS` is empty, analyze recent changes via `git diff HEAD~5 --stat` or look for spec artifacts (e.g., `openspec/`, `docs/`) to derive scope.
+- **Always confirm the inferred scope with the user before proceeding.** Summarize what you plan to test and ask if it matches their intent.
 
 For the identified scope:
 
