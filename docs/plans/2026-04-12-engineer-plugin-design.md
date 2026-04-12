@@ -20,7 +20,7 @@ A command can compose multiple skills; a skill can be reused across different co
 
 ## Directory Structure
 
-```
+```text
 plugins/engineer/
 ├── .claude-plugin/
 │   └── plugin.json

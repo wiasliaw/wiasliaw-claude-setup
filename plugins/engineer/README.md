@@ -25,7 +25,7 @@ A command can compose multiple skills; a skill can be reused across commands.
 
 ## Workflow
 
-```
+```text
   DEFINE          PLAN           BUILD          TEST           REVIEW         SIMPLIFY
  ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐
  │ Spec │ ───▶ │ Plan │ ───▶ │Build │ ───▶ │ Test │ ───▶ │Review│ ───▶ │Simpli│
@@ -52,7 +52,7 @@ A command can compose multiple skills; a skill can be reused across commands.
 
 ## Installation
 
-```
+```bash
 /plugin marketplace add wiasliaw/wiasliaw-claude-setup
 /plugin install engineer@wiasliaw-claude-plugins
 ```

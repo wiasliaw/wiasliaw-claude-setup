@@ -11,7 +11,7 @@ Read `skills/code-simplification/SKILL.md` to load simplification knowledge befo
 
 - If `$ARGUMENTS` specifies files or directories, use that as the scope.
 - If no argument is provided, default to recently modified files:
-  ```
+  ```bash
   git diff --name-only main..HEAD
   ```
 - List the files in scope and confirm with the user before proceeding.
