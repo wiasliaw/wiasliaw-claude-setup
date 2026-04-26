@@ -55,10 +55,6 @@ When you `SendMessage` a repo-manager, send exactly the payload below. Inline ev
 ## Phase
 propose | apply | explore | onboard | query
 
-## Repo Context
-<paste contents of .teamworks/repos/<this>.md>
-(omit if Phase: query — recipient already has its own card)
-
 ## Cross-repo Constraints
 <relevant slice of topology.md, e.g. "Your ABI is consumed by indexer.">
 (omit if Phase: query)
@@ -73,6 +69,8 @@ propose | apply | explore | onboard | query
 ```
 <!-- /SYNCED -->
 
+You no longer inline the receiving manager's identity card; the manager reads its own card from disk on every dispatch as part of onboarding. This avoids double IO (you reading the card to inline + the manager re-reading it on receipt) and bounds dispatch payload size.
+
 On your outgoing dispatches you only ever use `propose | apply | explore | onboard`; `query` appears only on incoming messages from peer repo-managers. Dispatch all relevant managers in a single message with parallel `SendMessage` tool calls. Do not serialise dispatches unless one manager's output is genuinely required as input to another's task.
 
 ### Enum discipline
@@ -85,6 +83,7 @@ Cross-manager `SendMessage` is allowed without your routing. When you synthesise
 
 - Maximum 3 retries per failed manager response within a single command. A response is "failed" when the manager replies `blocked` or `partial` and the mission requires `done`, or when the artifacts do not satisfy the `Expected Reply` contract.
 - Before each retry, you must articulate a new angle in the next dispatch payload's `## Task` section — a different decomposition, a missing constraint surfaced from another manager's reply, a narrowed scope, etc. If you cannot name a genuinely new angle, stop retrying that manager.
+- When you retry a manager within the same command, use the elision rule from `reference/dispatch-payload.md` — write `## Cross-repo Constraints: unchanged` instead of re-inlining the previous block. The receiver keeps the prior dispatch's constraints in effect; only `## Task` is regenerated (the new angle that justifies the retry). This bounds context cost across the retry budget.
 - On stop (3 retries exhausted or no new angle), record the blockers and report partial state to the user. Do not silently retry beyond the cap. Do not paper over a `blocked` reply by editing meta files as if the work were done.
 
 ## Approval policy
@@ -117,6 +116,8 @@ Rules:
 - Summaries are one line. If the message body is long, summarise; do not paste it.
 - Append only. Never rewrite earlier entries.
 
+The log also carries `## command: <name> <UTC-timestamp>` and `### mission: <mission-id>` anchors emitted by the slash commands themselves (see `reference/log-format.md`). You do NOT emit these anchors yourself — your per-message append format is unchanged. At synthesis time you may `awk` between anchors to scope reads to the relevant command or mission slice instead of pulling the whole day's log into context.
+
 ## Behaviour per command
 
 ### `add-repo`
@@ -124,7 +125,7 @@ Rules:
 - Invoked when the user runs `/teamworks:add-repo <path>`.
 - Read the target repo read-only: `README`, `package.json` / `Cargo.toml` / `pyproject.toml` / `go.mod`, top-level layout, primary language. Glance at `git remote -v` and the default branch.
 - Ask the user at most one or two clarification questions about purpose and role if the signals are ambiguous.
-- Write `.teamworks/repos/<name>.md` (identity card: language, frameworks, role in the workspace, current responsibilities, known interfaces it exposes / consumes).
+- Write `.teamworks/repos/<name>.md` (identity card: language, frameworks, role in the workspace, current responsibilities, known interfaces it exposes / consumes). Keep the card under ~2KB. Long-form repo knowledge belongs in the repo's own README; the card should be a quick-reference. Large cards × N repos × team-lead reads inflate context cost on every `propose` / `apply`.
 - Update `.teamworks/topology.md` (add the node to the diagram and any known edges to the table).
 - Optionally append a one-line note to `.teamworks/project.md` if the addition affects the mission.
 - Report the new identity card path and topology delta to the user.
@@ -149,8 +150,12 @@ Rules:
 ### `propose`
 
 - Invoked when the user runs `/teamworks:propose <description>`.
-- Read `.teamworks/{project,topology}.md` and every `repos/<name>.md`. Identify affected repos.
-- Dispatch affected managers in parallel with `Phase: propose`. Each manager runs openspec inside its repo and replies with the spec path and a summary.
+- Topology-first filter (bounds context cost: do NOT pre-read every `repos/<name>.md`):
+  1. Read `.teamworks/{project,topology}.md`.
+  2. From the user's description and the topology graph (edges, shared interfaces), derive the candidate set of affected repos.
+  3. Read only the candidate repos' identity cards (`.teamworks/repos/<name>.md`).
+  4. If during processing you discover the candidate set was wrong (a candidate is unaffected, or a non-candidate is actually affected), expand the read on demand — but document the revision in the mission detail file's `specs:` section so the lineage is auditable.
+- Dispatch the affected managers in parallel with `Phase: propose`. Each manager runs openspec inside its repo and replies with the spec path and a summary.
 - Review each reply against the mission and `topology.md`. Self-approve, or push back via the retry policy.
 - Once every repo spec is accepted, allocate a `mission-id` of the form `m-YYYYMMDD-<slug>` (e.g. `m-20260426-fee-on-transfer`) and write the mission in two places:
   1. Append a new row to the `## Missions` table in `.teamworks/project.md`: `| <mission-id> | approved | <one-line description> | [<repo>, <repo>] | missions/<mission-id>.md |`. The description must be a single line with no pipe (`|`) characters. The `repos` cell is the canonical dispatch list (names match the `<name>` in `.teamworks/repos/<name>.md`).

@@ -48,6 +48,18 @@ If the user did not supply a `<description>`, ask for one and stop
 until they reply. Do not invent a description on the user's behalf and
 do not proceed to spawn team-lead with an empty payload.
 
+## Step 3.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: propose %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
 ## Step 4: Spawn team-lead and dispatch (Phase: propose)
 
 Use `TeamCreate` to spawn the bundled `team-lead` agent. Then send the
@@ -63,17 +75,20 @@ Propose: <one-line summary of description>
 ## Phase
 propose
 
-## Repo Context
-(workspace-level mission proposal — team-lead reads
-`.teamworks/{project,topology}.md` and every `.teamworks/repos/*.md`
-to identify affected repos, then dispatches their managers)
-
 ## Cross-repo Constraints
 This is the SDD phase. Each affected manager runs openspec inside its
 own repo and replies with the spec path and a summary. team-lead
 self-approves each repo spec — no user gate between `propose` and
 `apply`. Managers do NOT run TDD or write production code in this
 phase; spec artifacts only.
+
+Topology-first filter (bounds context cost): identify candidate repos
+from `.teamworks/topology.md` (graph + shared interfaces) BEFORE
+reading any identity card. Then read only the candidate cards
+(`.teamworks/repos/<name>.md`), not all of them. If you discover the
+candidate set was wrong mid-flight (a candidate is unaffected, or a
+non-candidate is actually affected), expand the read on demand and
+document the revision in the mission detail file's `specs:` section.
 
 If you conclude no repos are affected by the description, do NOT
 allocate a mission-id, write a table row, or create a detail file.
@@ -106,8 +121,13 @@ file, do NOT add the table row.
 
 Per your `propose` behaviour:
 
-- Identify affected repos by reading `.teamworks/{project,topology}.md`
-  and every `.teamworks/repos/*.md`.
+- Identify affected repos topology-first: read
+  `.teamworks/{project,topology}.md`, derive the candidate set from
+  the description and the topology graph, then read ONLY the
+  candidates' identity cards (`.teamworks/repos/<name>.md`). Do NOT
+  pre-read every repo's card. Expand on discovery if mid-flight you
+  find the set was wrong, and note the revision in the detail file's
+  `specs:` section.
 - Dispatch the affected repo-managers in parallel with `Phase: propose`;
   each runs openspec inside its own repo and replies with the spec
   path and a summary.
@@ -186,6 +206,22 @@ team-lead reports completion.
 If team-lead reports `partial` or `blocked` for one or more repos,
 forward those blockers in full so the user can decide whether to
 intervene before running `/teamworks:apply <mission-id>`.
+
+## Step 5.5: Append mission sub-anchor to today's log
+
+If team-lead returned an allocated `mission-id` (i.e. the mission was
+approved and table-row-written is `yes`), append a mission sub-anchor
+under the command anchor written in Step 3.5 so synthesis-time reads
+can scope to this mission's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+printf '\n### mission: %s\n\n' "$MISSION_ID" >> ".teamworks/log/$DATE.md"
+```
+
+If team-lead reported `affected-repos: []` (no mission allocated) or
+returned `partial` / `blocked` without a mission-id, skip this step —
+there is no mission to anchor.
 
 ## Step 6: Tear down team-lead
 

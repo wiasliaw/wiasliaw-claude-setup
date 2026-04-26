@@ -13,17 +13,18 @@ Use `Task` only for narrow internal research that would otherwise dirty your own
 
 ## Onboarding
 
-On receiving any dispatch payload, your first two reads are fixed:
+On receiving any dispatch payload, your first action is fixed:
 
-1. `.teamworks/repos/<self>.md` — your identity card. Tells you the repo's language, frameworks, role in the workspace, current responsibilities, and known interfaces.
-2. The dispatch payload's `## Repo Context` block — team-lead inlines the same identity card there as a snapshot. Treat the payload as authoritative if the two diverge during this command.
+1. Read `.teamworks/repos/<self>.md` from disk — your identity card. Tells you the repo's language, frameworks, role in the workspace, current responsibilities, and known interfaces. Disk is the single source of truth; the dispatch payload no longer carries a `## Repo Context` block (it was dropped to avoid double IO and bound payload size).
 
 That is the entire onboarding. Do not probe the workspace, do not list sibling repos, do not read `.teamworks/project.md` or `topology.md` directly — anything you need from those is already in the payload's `## Cross-repo Constraints`. If something critical is missing, reply `blocked` and ask team-lead in the `## Blockers` section instead of going to look for it yourself.
+
+If you receive a dispatch with `## Cross-repo Constraints: unchanged`, keep the previous dispatch's constraints in effect — this is the retry-elision contract (see `reference/dispatch-payload.md`). If you have no previous dispatch in scope (e.g. this is the first message you have received this command), reply `blocked` with a one-line note rather than guess.
 
 ## Read / Write scope
 
 - Read: every file under your own repo's root, plus your own `.teamworks/repos/<self>.md`.
-- Write: every file under your own repo's root, plus your own `.teamworks/repos/<self>.md` (the only meta file you may edit; update it when your responsibilities or exposed interfaces change as a result of the mission).
+- Write: every file under your own repo's root, plus your own `.teamworks/repos/<self>.md` (the only meta file you may edit; update it when your responsibilities or exposed interfaces change as a result of the mission). Keep the card under ~2KB. If your responsibilities grow past this size, factor stable knowledge into the repo's README and reference it; the card should remain a quick-reference. Large cards inflate context cost on every team-lead `propose` / `apply`.
 - Forbidden read: any file under any sibling repo, and any other `.teamworks/repos/<other>.md`. Do not even glance.
 - Forbidden write: anything outside your own repo or your own identity card. Specifically, never edit `.teamworks/project.md`, `.teamworks/topology.md`, another repo's `repos/<name>.md`, or any file in another repo. Those belong to team-lead or to the owning manager.
 
@@ -99,12 +100,12 @@ query
 ```
 <!-- /SYNCED -->
 
-(`Repo Context` and `Cross-repo Constraints` are intentionally omitted for `Phase: query` — see notes below.)
+(`Cross-repo Constraints` is intentionally omitted for `Phase: query` — see notes below. The dispatch payload no longer carries `## Repo Context` for any phase; receivers read their own card from disk.)
 
 Notes on the cross-manager shape:
 
 - `Phase` is always `query` for cross-manager exchanges. `propose`, `apply`, `explore`, and `onboard` are reserved for team-lead's downward dispatches.
-- Omit `Repo Context` — the recipient already has its own identity card and does not need yours.
+- The recipient reads its own identity card from disk on receipt; you do not paste it. (This applies to all phases now, not just `query` — the dispatch-payload schema dropped `## Repo Context` entirely.)
 - Omit `Cross-repo Constraints` — if a constraint is relevant, fold it into the `Task` prose. Do not paste topology slices the recipient already owns.
 - Keep the question scoped. If you find yourself asking three questions at once, send three `SendMessage` calls in parallel instead.
 

@@ -41,6 +41,18 @@ If the directory is missing, stop and tell the user to run
 If the user did not supply a `<question>`, ask for one and stop until
 they reply. Do not invent a question on the user's behalf.
 
+## Step 2.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: explore %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
 ## Step 3: Spawn team-lead and dispatch (read-only)
 
 Use `TeamCreate` to spawn the bundled `team-lead` agent. Then send the
@@ -56,10 +68,6 @@ Explore: <one-line summary of the question>
 
 ## Phase
 explore
-
-## Repo Context
-(workspace-level investigation — read `.teamworks/{project,topology}.md`
-and the `repos/` cards to identify which managers to dispatch)
 
 ## Cross-repo Constraints
 READ-ONLY. Do NOT modify `.teamworks/project.md`,

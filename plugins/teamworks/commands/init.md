@@ -78,12 +78,31 @@ Write `.teamworks/topology.md` with this skeleton:
 (none yet)
 ```
 
-## Step 5: Verify
+## Step 5: Append command anchor to today's log
+
+Now that `.teamworks/log/` exists (created in Step 2), append the
+command-anchor heading so future commands and team-lead synthesis can
+seek to this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+printf '\n## command: init %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
+This is the only command for which the anchor write also bootstraps
+the log file (init created the directory in Step 2; the file is
+created here implicitly by the redirect). Other commands fail-fast on
+a missing `.teamworks/` before writing the anchor, so init is the
+special case.
+
+## Step 6: Verify
 
 Confirm `.teamworks/project.md` and `.teamworks/topology.md` exist and
-that `.teamworks/repos/`, `.teamworks/log/`, and `.teamworks/missions/`
-are empty directories. Print a one-line summary and suggest
-`/teamworks:add-repo <path>` as the next step.
+that `.teamworks/repos/` and `.teamworks/missions/` are empty
+directories. `.teamworks/log/` will contain today's log file with the
+command-anchor heading written in Step 5. Print a one-line summary and
+suggest `/teamworks:add-repo <path>` as the next step.
 
 ## Mission Block Schema
 

@@ -43,6 +43,20 @@ The current working directory must be the workspace root containing
 If the directory is missing, print `no workspace found, nothing to do`
 and exit cleanly. Do not create `.teamworks/`; do not error.
 
+## Step 2.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: shutdown %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
+The session-end line written in Step 4 is appended below this anchor.
+
 ## Step 3: Reap stray Team agents
 
 Try to enumerate live Team agents using whatever Team-list capability
@@ -82,12 +96,12 @@ TIME="$(date -u +%H:%M)"
 LOG=".teamworks/log/${DATE}.md"
 ```
 
-If `$LOG` does not exist, skip this step (no activity was logged
-today). Otherwise count its existing entries and append a single
-shutdown line in the same `[HH:MM] [<from> -> <to>] <summary>` shape
-used by `team-lead` and `repo-manager`. Shutdown is not a real
-`SendMessage`, so the synthetic recipient is `session` (the outer
-session that invoked `/teamworks:shutdown`):
+`$LOG` will exist (Step 2.5 just wrote the shutdown command anchor
+to it). Count its existing entries and append a single shutdown line
+in the same `[HH:MM] [<from> -> <to>] <summary>` shape used by
+`team-lead` and `repo-manager`. Shutdown is not a real `SendMessage`,
+so the synthetic recipient is `session` (the outer session that
+invoked `/teamworks:shutdown`):
 
 <!-- SYNCED FROM reference/log-format.md — edit there, then re-sync here -->
 ```bash

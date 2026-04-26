@@ -39,6 +39,18 @@ The current working directory must be the workspace root containing
 If the directory is missing, stop and tell the user to run
 `/teamworks:init` first. Do not proceed.
 
+## Step 2.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: add-agent %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
 ## Step 3: Validate args
 
 `<role>` is required. If the user did not supply one, ask for it and
@@ -86,9 +98,6 @@ add-agent: register specialty agent <role>
 
 ## Phase
 onboard
-
-## Repo Context
-(none — this is a workspace-level registration; no repo is involved)
 
 ## Cross-repo Constraints
 (read `.teamworks/project.md` `## Specialty Agents` section to avoid

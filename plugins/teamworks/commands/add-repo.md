@@ -36,6 +36,18 @@ The current working directory must be the workspace root containing
 If the directory is missing, stop and tell the user to run
 `/teamworks:init` first. Do not proceed.
 
+## Step 2.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: add-repo %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
 ## Step 3: Validate target path is a git repo
 
 Resolve `<path>` to an absolute path and confirm it is a directory
@@ -72,10 +84,6 @@ add-repo: register <name> into the workspace
 ## Phase
 onboard
 
-## Repo Context
-(none yet — this is the onboarding dispatch; you are creating the
-identity card)
-
 ## Cross-repo Constraints
 (read `.teamworks/topology.md` to see existing nodes and edges)
 
@@ -87,7 +95,9 @@ Per your `add-repo` behaviour:
    layout, `git remote -v`, default branch).
 2. Ask the user at most one or two clarification questions if signals
    are ambiguous.
-3. Write `.teamworks/repos/<name>.md` (the identity card).
+3. Write `.teamworks/repos/<name>.md` (the identity card). Keep it
+   under ~2KB — long-form repo knowledge belongs in the repo's own
+   README, not the card.
 4. Update `.teamworks/topology.md` (diagram + edges table).
 5. Optionally append a one-line note to `.teamworks/project.md` if
    the addition affects the workspace mission.

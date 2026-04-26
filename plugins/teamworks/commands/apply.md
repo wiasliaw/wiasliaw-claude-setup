@@ -38,6 +38,18 @@ The current working directory must be the workspace root containing
 If the directory is missing, stop and tell the user to run
 `/teamworks:init` first. Do not proceed.
 
+## Step 2.5: Append command anchor to today's log
+
+Append a top-level command anchor so team-lead synthesis can seek to
+this command's slice (see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+TS=$(date -u +"%F %H:%M UTC")
+mkdir -p .teamworks/log
+printf '\n## command: apply %s\n\n' "$TS" >> ".teamworks/log/$DATE.md"
+```
+
 ## Step 3: Validate `<mission-id>` exists and is approved
 
 If the user did not supply a `<mission-id>`, ask for one and stop
@@ -114,18 +126,19 @@ protocol"). The `Phase` is `apply`. Use this payload shape:
 ## Phase
 apply
 
-## Repo Context
-(workspace-level execution — team-lead reads the mission's row in
-`.teamworks/project.md`'s `## Missions` table to confirm the
-mission-id and status, then loads the full mission body from
-`.teamworks/missions/<mission-id>.md`. The detail file's `repos:`
-field is the canonical dispatch set.)
-
 ## Cross-repo Constraints
 This is the TDD execution phase. Each affected manager runs TDD per
 their approved spec: red (failing test) -> green (minimum
 implementation) -> refactor. Tests must precede production code; do
 NOT skip the red step.
+
+(Workspace-level setup for team-lead: read the mission's row in
+`.teamworks/project.md`'s `## Missions` table to confirm the
+mission-id and status, then load the full mission body from
+`.teamworks/missions/<mission-id>.md`. The detail file's `repos:`
+field is the canonical dispatch set. Each dispatched manager reads
+its own identity card from disk on receipt — the dispatch payload no
+longer inlines `## Repo Context`.)
 
 NO managers (and not you) may run `git commit`, `git push`, `git
 pull`, `git fetch`, `git merge`, `git rebase`, `git reset`, `git
@@ -198,6 +211,18 @@ outer session.
 
 Substitute the real `<mission-id>` and the one-line mission summary
 before sending.
+
+## Step 4.5: Append mission sub-anchor to today's log
+
+Immediately after dispatching team-lead against `<mission-id>`,
+append a mission sub-anchor under the command anchor written in
+Step 2.5 so synthesis-time reads can scope to this mission's slice
+(see `reference/log-format.md`):
+
+```bash
+DATE=$(date -u +%F)
+printf '\n### mission: %s\n\n' "<mission-id>" >> ".teamworks/log/$DATE.md"
+```
 
 ## Step 5: Wait for team-lead's report and forward verbatim
 
