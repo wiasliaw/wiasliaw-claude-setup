@@ -94,6 +94,7 @@ the first message via `SendMessage` using the structured payload that
 team-lead expects (see `agents/team-lead.md` Section "Dispatch
 protocol"). The `Phase` is `apply`. Use this payload shape:
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 <mission-id>: <one-line summary lifted from the mission block>
@@ -172,6 +173,7 @@ session.
 - blockers: <aggregate blockers across repos, if any>
 - next-step: "user owns git from here" (always include this line)
 ```
+<!-- /SYNCED -->
 
 Substitute the real `<mission-id>` and the one-line mission summary
 before sending.

@@ -83,6 +83,7 @@ the next step.
 
 ## Mission Block Schema
 
+<!-- SYNCED FROM reference/mission-block.md — edit there, then re-sync here -->
 `/teamworks:propose` writes mission blocks to `.teamworks/project.md` under
 the `## Missions` section. `/teamworks:apply` and `/teamworks:shutdown`
 parse them. The block grammar is line-oriented:
@@ -105,3 +106,4 @@ Parsers MUST anchor matches (e.g. `^mission-id: <id>$`, not substring) to
 avoid prefix collisions. Future schema changes require updating
 `/teamworks:propose` (writer), `/teamworks:apply` (parser), and
 `/teamworks:shutdown` (parser/appender) atomically.
+<!-- /SYNCED -->

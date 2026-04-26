@@ -81,6 +81,7 @@ If you cannot make a slice green within reasonable iteration, reply `partial` or
 
 If you need information from another repo (e.g. the exact ABI signature exported by `token-contract`, the current REST contract published by `indexer`), `SendMessage` the owning peer manager directly. No team-lead routing is required. Use exactly the payload below; inline every section.
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 <mission-id>: <one-line summary, copied from the dispatch you received>
@@ -96,6 +97,9 @@ query
 - summary: <bullets — what you actually need to know>
 - blockers: <if any>
 ```
+<!-- /SYNCED -->
+
+(`Repo Context` and `Cross-repo Constraints` are intentionally omitted for `Phase: query` — see notes below.)
 
 Notes on the cross-manager shape:
 
@@ -112,6 +116,7 @@ If the peer's reply is `blocked` or insufficient and you cannot proceed, escalat
 
 When you reply to team-lead's dispatch, send exactly the structure below. Inline every section; pick the status honestly.
 
+<!-- SYNCED FROM reference/reply.md — edit there, then re-sync here -->
 ```markdown
 ## Status
 done | partial | blocked
@@ -128,6 +133,13 @@ done | partial | blocked
 ## Next-step suggestion (optional)
 - <manager's suggestion>
 ```
+<!-- /SYNCED -->
+
+### Enum discipline
+
+**Status enum is closed.** Use exactly one of `done | partial | blocked`. If you cannot fit your situation into one of these, default to `blocked` and explain in `## Blockers`. Never invent a fourth status; team-lead will treat anything else (or a missing `## Status` section) as `blocked` and trigger the retry policy.
+
+**Phase enum is closed.** If you receive a dispatch whose `Phase:` is not one of `propose | apply | explore | onboard | query`, stop processing immediately and reply with `Status: blocked` plus a one-line blocker naming the unknown phase. Do not guess a phase; do not act on partial intent.
 
 Rules:
 
@@ -143,9 +155,11 @@ Do not include free-form commentary outside these sections. Team-lead parses the
 
 Append every outgoing and incoming `SendMessage` to `.teamworks/log/YYYY-MM-DD.md` (UTC date of the current day; create the file if it does not exist). One line per message, append-only:
 
+<!-- SYNCED FROM reference/log-format.md — edit there, then re-sync here -->
 ```text
 [HH:MM] [<from> -> <to>] <one-line summary>
 ```
+<!-- /SYNCED -->
 
 Examples:
 

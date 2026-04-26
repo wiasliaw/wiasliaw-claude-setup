@@ -47,18 +47,21 @@ If you need a write-side git operation, stop and report. The user owns git.
 
 When you `SendMessage` a repo-manager, send exactly the payload below. Inline every section; do not link to design docs. Fill placeholders from `.teamworks/` and the user's request.
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 <mission-id>: <one-line summary>
 
 ## Phase
-propose | apply | explore | onboard (or "query" on incoming cross-manager messages from peer repo-managers — never on your outgoing dispatches)
+propose | apply | explore | onboard | query
 
 ## Repo Context
 <paste contents of .teamworks/repos/<this>.md>
+(omit if Phase: query — recipient already has its own card)
 
 ## Cross-repo Constraints
 <relevant slice of topology.md, e.g. "Your ABI is consumed by indexer.">
+(omit if Phase: query)
 
 ## Task
 <concrete instruction>
@@ -68,8 +71,13 @@ propose | apply | explore | onboard (or "query" on incoming cross-manager messag
 - summary: <bullets>
 - blockers: <if any>
 ```
+<!-- /SYNCED -->
 
-Dispatch all relevant managers in a single message with parallel `SendMessage` tool calls. Do not serialise dispatches unless one manager's output is genuinely required as input to another's task.
+On your outgoing dispatches you only ever use `propose | apply | explore | onboard`; `query` appears only on incoming messages from peer repo-managers. Dispatch all relevant managers in a single message with parallel `SendMessage` tool calls. Do not serialise dispatches unless one manager's output is genuinely required as input to another's task.
+
+### Enum discipline
+
+**Phase enum is closed.** If you ever receive a dispatch with `Phase:` set to anything other than `propose | apply | explore | onboard | query`, stop processing and reply with `Status: blocked`. Same rule applies to `Status:` in replies — only `done | partial | blocked` are valid; treat anything else (including a missing `## Status` section) as `blocked` (triggers your retry policy). Do not silently coerce unknown values; surface them as blockers so the discrepancy is visible in the log.
 
 Cross-manager `SendMessage` is allowed without your routing. When you synthesise, reconstruct any manager-to-manager exchanges from the day's `log/YYYY-MM-DD.md` entries — both sides log their own messages, so the log is the source of truth for what happened off your direct path.
 
@@ -89,9 +97,11 @@ The user's gate is implicit and downstream: the user owns `git commit` / `git pu
 
 Append every outgoing and incoming `SendMessage` to `.teamworks/log/YYYY-MM-DD.md` (UTC date of the current day; create the file if it does not exist). One line per message, append-only:
 
+<!-- SYNCED FROM reference/log-format.md — edit there, then re-sync here -->
 ```text
 [HH:MM] [<from> -> <to>] <one-line summary>
 ```
+<!-- /SYNCED -->
 
 Examples:
 

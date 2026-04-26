@@ -83,16 +83,19 @@ LOG=".teamworks/log/${DATE}.md"
 
 If `$LOG` does not exist, skip this step (no activity was logged
 today). Otherwise count its existing entries and append a single
-shutdown line in the same `[HH:MM] [<from>] <summary>` shape used by
-`team-lead` and `repo-manager` (no source/target arrow because
-shutdown is not a `SendMessage`):
+shutdown line in the same `[HH:MM] [<from> -> <to>] <summary>` shape
+used by `team-lead` and `repo-manager`. Shutdown is not a real
+`SendMessage`, so the synthetic recipient is `session` (the outer
+session that invoked `/teamworks:shutdown`):
 
+<!-- SYNCED FROM reference/log-format.md — edit there, then re-sync here -->
 ```bash
 if [ -f "$LOG" ]; then
   N=$(grep -c '' "$LOG")
-  printf '[%s] [shutdown] session ended; %s entries this session\n' "$TIME" "$N" >> "$LOG"
+  printf '[%s] [shutdown -> session] session ended; %s entries this session\n' "$TIME" "$N" >> "$LOG"
 fi
 ```
+<!-- /SYNCED -->
 
 `grep -c ''` counts every line including an unterminated final line
 (unlike `wc -l`, which under-counts when the file lacks a trailing

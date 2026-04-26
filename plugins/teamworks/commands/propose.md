@@ -53,6 +53,7 @@ first message via `SendMessage` using the structured payload that
 team-lead expects (see `agents/team-lead.md` Section "Dispatch
 protocol"). The `Phase` is `propose`. Use this payload shape:
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 Propose: <one-line summary of description>
@@ -124,6 +125,7 @@ Per your `propose` behaviour:
 - summary: <one paragraph describing the proposed mission>
 - blockers: <if any manager replied partial / blocked>
 ```
+<!-- /SYNCED -->
 
 Substitute the one-line summary and the verbatim description before
 sending.

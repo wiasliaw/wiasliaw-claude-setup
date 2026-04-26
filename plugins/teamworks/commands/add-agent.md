@@ -79,6 +79,7 @@ first message via `SendMessage` using the structured payload that
 team-lead expects (see `agents/team-lead.md` Section "Dispatch
 protocol"):
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 add-agent: register specialty agent <role>
@@ -132,6 +133,7 @@ Do not spawn `<role>` now. Later commands will invoke it on demand.
   registered purpose
 - blockers: any clarifying questions or unresolved issues
 ```
+<!-- /SYNCED -->
 
 Substitute `<role>` and `<brief>` before sending.
 

@@ -64,6 +64,7 @@ first message via `SendMessage` using the structured payload that
 team-lead expects (see `agents/team-lead.md` Section "Dispatch
 protocol"):
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 add-repo: register <name> into the workspace
@@ -97,6 +98,7 @@ Per your `add-repo` behaviour:
   role in the workspace
 - blockers: any clarifying questions or unresolved issues
 ```
+<!-- /SYNCED -->
 
 Substitute `<name>` (the repo's directory basename), `<absolute-path>`,
 and `<reason>` before sending.

@@ -49,6 +49,7 @@ team-lead expects (see `agents/team-lead.md` Section "Dispatch
 protocol"). The `Phase` is `explore` and the payload must reinforce
 the read-only nature of the investigation in multiple places:
 
+<!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
 Explore: <one-line summary of the question>
@@ -87,6 +88,7 @@ Synthesise the managers' replies into a single answer for the user.
 - per-repo notes: short bullet per repo you consulted, if applicable
 - blockers: any unresolved questions or repos you could not answer for
 ```
+<!-- /SYNCED -->
 
 Substitute the one-line summary and the verbatim question before
 sending.
