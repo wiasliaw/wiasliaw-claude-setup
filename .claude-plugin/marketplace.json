@@ -9,6 +9,11 @@
       "name": "autoresearch",
       "description": "Autonomous research framework built on Claude Code. Define a research goal, and AI agents automatically iterate, evaluate, and improve until convergence criteria are met or the budget is exhausted.",
       "source": "./plugins/autoresearch"
+    },
+    {
+      "name": "teamworks",
+      "description": "Cross-repo orchestrator. Workspace folder + one repo-manager agent per repo + team-lead agent, communicating via Claude Code Team SendMessage.",
+      "source": "./plugins/teamworks"
     }
   ]
 }

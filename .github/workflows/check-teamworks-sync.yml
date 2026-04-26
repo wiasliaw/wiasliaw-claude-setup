@@ -1,0 +1,21 @@
+name: Check Teamworks Sync
+
+on:
+  pull_request:
+    paths:
+      - "plugins/teamworks/**/*.md"
+      - ".github/scripts/check-teamworks-sync.ts"
+      - ".github/workflows/check-teamworks-sync.yml"
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verify SYNCED blocks match canonical references
+        run: node --experimental-strip-types .github/scripts/check-teamworks-sync.ts

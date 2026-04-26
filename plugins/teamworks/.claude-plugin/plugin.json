@@ -1,0 +1,7 @@
+{
+  "name": "teamworks",
+  "description": "Cross-repo orchestrator built on Claude Code Team. Treat a folder as a workspace of independent git repos; one repo-manager agent per repo, coordinated by a team-lead agent. Provides slash commands for init, add-repo, propose, apply, explore, and shutdown.",
+  "author": {
+    "name": "wiasliaw"
+  }
+}
