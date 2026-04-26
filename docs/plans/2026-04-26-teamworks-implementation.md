@@ -347,7 +347,7 @@ Behaviours > add-repo".
 
 ```yaml
 ---
-allowed-tools: Bash, Read, SendMessage, TeamCreate
+allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
 description: Register a new repo into the workspace. Spawns team-lead, which produces .teamworks/repos/<name>.md and updates topology.md.
 ---
 ```
@@ -392,7 +392,7 @@ git commit -m "feat(teamworks): add add-repo command"
 
 ```yaml
 ---
-allowed-tools: Bash, Read, SendMessage, TeamCreate
+allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
 description: Register a project-scoped specialty agent (e.g. security-reviewer, qa). Writes the definition to $project/.claude/agents/<role>.md and registers it in project.md.
 ---
 ```
@@ -437,7 +437,7 @@ git commit -m "feat(teamworks): add add-agent command"
 
 ```yaml
 ---
-allowed-tools: Bash, Read, SendMessage, TeamCreate
+allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
 description: Ask the team-lead a question about the workspace. Read-only against .teamworks/; dispatches managers in parallel for investigation; only log/ is appended.
 ---
 ```
@@ -480,7 +480,7 @@ git commit -m "feat(teamworks): add explore command"
 
 ```yaml
 ---
-allowed-tools: Bash, Read, SendMessage, TeamCreate
+allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
 description: Run cross-repo SDD via openspec. Team-lead dispatches managers, self-approves their specs, writes a mission block to project.md, and updates topology.md if interfaces change.
 ---
 ```
@@ -533,7 +533,7 @@ git commit -m "feat(teamworks): add propose command"
 
 ```yaml
 ---
-allowed-tools: Bash, Read, SendMessage, TeamCreate
+allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
 description: Execute an approved mission. Team-lead dispatches managers to run TDD per spec; no commits. On failure, retries up to 3 times with new angle. Reports per-repo status; the user owns git.
 ---
 ```
@@ -587,7 +587,7 @@ git commit -m "feat(teamworks): add apply command"
 
 ```yaml
 ---
-allowed-tools: Bash, Read, Write, TeamCreate
+allowed-tools: Bash, Read, Write, TeamCreate, TeamDelete
 description: Reap stray Team agents, append today's log summary, and append a session summary to project.md if the latest mission lacks one. Preserves .teamworks/.
 ---
 ```
