@@ -1,6 +1,6 @@
 ---
 allowed-tools: Bash, Read, SendMessage, TeamCreate, TeamDelete
-description: Run cross-repo SDD via openspec. Team-lead dispatches managers, self-approves their specs, writes a mission block to project.md, and updates topology.md if interfaces change.
+description: Run cross-repo SDD via openspec. Team-lead dispatches managers, self-approves their specs, writes a mission row to project.md plus a detail file under .teamworks/missions/, and updates topology.md if interfaces change.
 ---
 
 Announce: "Using teamworks:propose to draft a cross-repo mission: <description>."
@@ -8,8 +8,10 @@ Announce: "Using teamworks:propose to draft a cross-repo mission: <description>.
 The slash command syntax is `/teamworks:propose <description>`. The
 `<description>` argument is required and may be free-form prose
 describing the cross-repo change. `propose` allocates a new
-`mission-id` and writes the mission block to `.teamworks/project.md`;
-no user gate sits between `propose` and `apply`.
+`mission-id`, writes a table row to `.teamworks/project.md`'s
+`## Missions` section, and creates a detail file at
+`.teamworks/missions/<mission-id>.md` holding the full mission
+content. No user gate sits between `propose` and `apply`.
 
 ## Step 0: Confirm working directory
 
@@ -74,10 +76,10 @@ self-approves each repo spec — no user gate between `propose` and
 phase; spec artifacts only.
 
 If you conclude no repos are affected by the description, do NOT
-allocate a mission-id or write a mission block. Reply with
-`affected-repos: []` and a one-line explanation (e.g. "no repo touches
-the described surface area"). The outer session will relay your
-reasoning to the user.
+allocate a mission-id, write a table row, or create a detail file.
+Reply with `affected-repos: []` and a one-line explanation (e.g.
+"no repo touches the described surface area"). The outer session will
+relay your reasoning to the user.
 
 If a manager reports openspec is not installed, treat that as an
 immediate setup blocker — do NOT retry (the retry policy is for
@@ -86,9 +88,18 @@ the user can install openspec and re-run.
 
 A mission is approved only if EVERY affected repo's spec is accepted.
 If any repo's spec is `blocked` or `partial` after retries, do NOT
-write a mission block; report the partial state (which repos
-succeeded, which blocked, why) and stop. The user will intervene and
-re-run `propose`.
+write a table row or create a detail file; report the partial state
+(which repos succeeded, which blocked, why) and stop. The user will
+intervene and re-run `propose`.
+
+Mission storage is split (v2):
+
+1. A new row in `.teamworks/project.md`'s `## Missions` table.
+2. A detail file at `.teamworks/missions/<mission-id>.md` containing
+   the full mission body.
+
+Both writes must succeed or neither — if you cannot write the detail
+file, do NOT add the table row.
 
 ## Task
 <user's description, verbatim>
@@ -104,15 +115,35 @@ Per your `propose` behaviour:
   or push back via the retry policy.
 - Once every repo spec is accepted, allocate a `mission-id` of the
   form `m-YYYYMMDD-<slug>` (e.g. `m-20260426-fee-on-transfer`).
-- Write a new mission block to `.teamworks/project.md` under
-  `## Missions`. The block must include:
-  - `mission-id: m-YYYYMMDD-<slug>`
-  - `status: approved`
-  - `description: <user description>`
-  - `repos: [<list of affected repo names>]` — canonical list that
-    `apply` reads to know who to dispatch; names match the `<name>` in
-    `.teamworks/repos/<name>.md`.
-  - links / paths to each repo's spec artifact.
+- Append a new row to the `## Missions` table in
+  `.teamworks/project.md`:
+  `| <mission-id> | approved | <one-line description> | [<repo>, <repo>] | missions/<mission-id>.md |`
+  The description must be a single line with no pipe (`|`) characters
+  (replace with `/` or `,` if needed). The `repos` cell is the
+  canonical dispatch list that `apply` will use; names match the
+  `<name>` in `.teamworks/repos/<name>.md`.
+- Create the detail file at `.teamworks/missions/<mission-id>.md` with
+  this body (literal markdown):
+  - Top heading: `# Mission: <mission-id>`
+  - Then a blank line, then a bullet list with these keys (each on its
+    own line):
+    - `- mission-id: <mission-id>`
+    - `- description: <one-line description, same as the table row>`
+    - `- repos: [<repo>, <repo>]`
+    - `- created: YYYY-MM-DD HH:MM UTC`
+    - `- specs:` followed by one indented sub-bullet per spec, e.g.
+      `  - <repo>: <path-to-spec-artifact relative to that repo's root>`
+
+  Do NOT write a `status:` line into the detail file. The mission's
+  status lives only in the `status` cell of its row in `project.md`'s
+  `## Missions` table — that cell is the single source of truth.
+  Duplicating status in the detail file would create a drift hazard
+  between `apply` (which flips the cell) and any reader of the detail
+  file.
+
+  Do NOT add an `applied-summary:` line in `propose` either; that is
+  appended by `/teamworks:shutdown` after a successful `apply`. See
+  `reference/mission-block.md` for the full v2 detail file format.
 - Update `.teamworks/topology.md` (both diagram and edge table) only
   if any interface changed (added / removed / changed export, new
   edge, etc.).
@@ -121,6 +152,8 @@ Per your `propose` behaviour:
 - mission-id: m-YYYYMMDD-<slug>
 - affected-repos: [<list>]
 - spec-paths: [<per-repo paths>]
+- table-row-written: yes
+- detail-file-path: missions/<mission-id>.md
 - topology-updated: yes | no
 - summary: <one paragraph describing the proposed mission>
 - blockers: <if any manager replied partial / blocked>
@@ -138,6 +171,10 @@ do not summarise or paraphrase. The expected report includes:
 - the allocated `mission-id`,
 - the list of affected repos,
 - the spec path for each repo,
+- `table-row-written: yes` confirming the row was added to
+  `project.md`,
+- `detail-file-path: missions/<mission-id>.md` confirming the detail
+  file was created,
 - whether `topology.md` was updated,
 - a one-paragraph summary of the proposed mission,
 - any blockers (e.g. a manager replied `partial` or `blocked`).

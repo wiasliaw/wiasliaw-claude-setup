@@ -1,31 +1,75 @@
-# Mission Block Schema
+# Mission Schema (v2: table + detail)
 
-The mission block lives inside `.teamworks/project.md`'s `## Missions` section, and is also persisted as a detail file at `.teamworks/missions/<id>.md`.
+Missions are stored in two places:
 
-NOTE: this file describes the CURRENT (pre-table) format. Commit 2 of the refactor introduces a table-row + detail-file split (see `mission-table.md` and `mission-detail.md` once they exist). For now, this is the v1 format used by all consumers as of branch tip 7820df4.
+1. A row in `.teamworks/project.md`'s `## Missions` table (the index).
+2. A detail file at `.teamworks/missions/<mission-id>.md` (the full mission content).
 
-## v1 Format (current)
+This split bounds `project.md` size: the table grows ~1 row per mission, and full mission contents live in per-mission files that consumers load only when needed.
 
-`/teamworks:propose` writes mission blocks to `.teamworks/project.md` under the `## Missions` section. `/teamworks:apply` and `/teamworks:shutdown` parse them. The block grammar is line-oriented:
+## v2 Table Row Format
 
-- One blank line separates mission blocks.
-- Each block contains these lines, each on its own line, in this order:
-  - `mission-id: m-YYYYMMDD-<slug>` — kebab-case slug, no spaces.
-  - `status: approved | applied` — exactly one of these two.
-  - `description: <one paragraph>` — single line; multi-paragraph descriptions are NOT supported.
-  - `repos: [<repo-name>, <repo-name>, ...]` — JSON-style list of repo names matching `<name>` in `.teamworks/repos/<name>.md`.
-  - `specs:` followed by one indented bullet per spec path:
-    - `  - <repo>: <path-to-spec-artifact>`
-- Optional trailing line (added by `/teamworks:shutdown` when the mission is applied):
-  - `applied-summary: session ended at YYYY-MM-DD HH:MM UTC`
+The `## Missions` section in `project.md` is a markdown table:
 
-Parsers MUST anchor matches (e.g. `^mission-id: <id>$`, not substring) to avoid prefix collisions.
+```markdown
+## Missions
+| mission-id | status | description | repos | detail |
+|---|---|---|---|---|
+| m-YYYYMMDD-<slug> | approved \| applied | <one-line description> | [<repo>, <repo>] | missions/<mission-id>.md |
+```
 
-The `## Missions` section MUST remain the final section of project.md (shutdown's append relies on EOF == end-of-last-mission-block).
+Constraints:
+- mission-id: kebab-case slug, no spaces, format `m-YYYYMMDD-<slug>`.
+- status: exactly one of `approved` or `applied`.
+- description: ONE LINE. Must not contain pipe (`|`) characters; replace with `/` or `,` if needed.
+- repos: JSON-style list `[name, name]`. Repo names match `<name>` in `.teamworks/repos/<name>.md`.
+- detail: relative path `missions/<mission-id>.md` (relative to `.teamworks/`).
+
+## v2 Detail File Format
+
+Each mission's full content lives at `.teamworks/missions/<mission-id>.md`:
+
+```markdown
+# Mission: <mission-id>
+
+- mission-id: <mission-id>
+- description: <one-line description, same as table row>
+- repos: [<repo>, <repo>]
+- created: YYYY-MM-DD HH:MM UTC
+- specs:
+  - <repo>: <path-to-spec-artifact relative to that repo's root>
+  - <repo>: <path>
+- applied-summary: session ended at YYYY-MM-DD HH:MM UTC   (added by shutdown when applicable)
+```
+
+Status is deliberately NOT in the detail file. The single source of truth for a mission's status is the `status` cell of its row in `project.md`'s `## Missions` table — duplicating it in the detail file would create a drift hazard. `apply` flips the table cell; `shutdown` only appends `applied-summary` to the detail file. Neither writes a `status:` line into the detail file.
+
+The `applied-summary` line is added by `/teamworks:shutdown` only when status flips to `applied`. Optional otherwise; its presence is a de-facto marker that the mission was applied (the table cell is the authoritative source).
+
+## Writers
+
+- `/teamworks:propose`: writes a new table row to `project.md` AND creates the detail file.
+- `/teamworks:apply`: flips the table row's `status` cell from `approved` to `applied` (only if all managers `done`); does NOT modify the detail file.
+- `/teamworks:shutdown`: appends the `applied-summary` line to the detail file (NOT to `project.md`). Does NOT modify the table.
+
+## Parsers
+
+- `/teamworks:apply` reads:
+  - `project.md`'s `## Missions` table to find the row matching `<mission-id>` and verify `status: approved`.
+  - The detail file at `missions/<mission-id>.md` for full mission data (description, repos, specs).
+- `/teamworks:shutdown` reads:
+  - `project.md`'s table to find the latest mission with `status: applied` (the last table row whose status cell is `applied`).
+  - The detail file for that mission to check whether `applied-summary` already exists.
+
+## Anchoring rules
+
+When parsers grep the table for a mission-id:
+- Must anchor on the exact mission-id between `|` delimiters: `| m-20260426-foo |`, NOT a substring match on `m-20260426-foo` (which would match `m-20260426-foo-extra`).
+- The detail-path column gives an unambiguous filename — use it after parsing the row.
 
 ## Notes
 
-- Inlined description lives in: init.md (Mission Block Schema section).
-- Writers: propose.md.
-- Parsers: apply.md (awk in Step 3), shutdown.md (Step 5).
-- This file will be superseded by `mission-table.md` + `mission-detail.md` in Commit 2.
+- Inlined description lives in: `init.md` (the table skeleton + detail-file shape).
+- Writers: `propose.md` (row + detail file), `apply.md` (status cell flip), `shutdown.md` (applied-summary appended to detail file).
+- Parsers: `apply.md` (Step 3 awk on the table; then read detail file), `shutdown.md` (Step 5 scan table for latest applied row, then read detail file).
+- The `## Missions` section MUST remain the final section of `project.md`. v2 no longer appends to `project.md` from `shutdown`, but keeping the table last simplifies parsers (table extends to EOF) and preserves the cwd-anchored append rules from v1.

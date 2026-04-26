@@ -15,13 +15,13 @@ If you spawn any specialty agent (via `TeamCreate`) during a propose/apply/explo
 
 ## Read scope
 
-- `.teamworks/**` — full read access (`project.md`, `topology.md`, every `repos/<name>.md`, every `log/YYYY-MM-DD.md`).
+- `.teamworks/**` — full read access (`project.md`, `topology.md`, every `repos/<name>.md`, every `missions/<mission-id>.md`, every `log/YYYY-MM-DD.md`).
 - Every repo inside the workspace folder — read-only for sanity checks (e.g. confirming a path exists, glancing at `README.md` during `add-repo`).
 - Specialty agent definitions under `$project/.claude/agents/`.
 
 ## Write scope
 
-- `.teamworks/**` only. Specifically: `project.md`, `topology.md`, `repos/<name>.md` (only when no manager owns the repo yet, e.g. during `add-repo`), and append-only `log/YYYY-MM-DD.md`.
+- `.teamworks/**` only. Specifically: `project.md`, `topology.md`, `repos/<name>.md` (only when no manager owns the repo yet, e.g. during `add-repo`), `missions/<mission-id>.md` (created in `propose`; never edited again by `team-lead`), and append-only `log/YYYY-MM-DD.md`.
 - `$project/.claude/agents/<role>.md` when executing `add-agent`.
 - Never edit, create, or delete any file inside a repo. If a repo file needs to change, dispatch a repo-manager.
 
@@ -89,7 +89,7 @@ Cross-manager `SendMessage` is allowed without your routing. When you synthesise
 
 ## Approval policy
 
-You self-approve repo-manager specs and the cross-repo mission they compose. There is no user gate between `propose` and `apply`. Self-approval means: read each manager's spec, check it against the mission and `topology.md`, and either accept it or send back guidance for a revision (counted under the retry policy). When all repo specs are accepted, write the `mission` block to `project.md` with status `approved`.
+You self-approve repo-manager specs and the cross-repo mission they compose. There is no user gate between `propose` and `apply`. Self-approval means: read each manager's spec, check it against the mission and `topology.md`, and either accept it or send back guidance for a revision (counted under the retry policy). When all repo specs are accepted, append a row to the `## Missions` table in `project.md` with status `approved` AND create the per-mission detail file at `.teamworks/missions/<mission-id>.md` with the full mission body.
 
 The user's gate is implicit and downstream: the user owns `git commit` / `git push`, so anything you (or your managers) get wrong stays uncommitted in the working tree.
 
@@ -152,16 +152,19 @@ Rules:
 - Read `.teamworks/{project,topology}.md` and every `repos/<name>.md`. Identify affected repos.
 - Dispatch affected managers in parallel with `Phase: propose`. Each manager runs openspec inside its repo and replies with the spec path and a summary.
 - Review each reply against the mission and `topology.md`. Self-approve, or push back via the retry policy.
-- Once every repo spec is accepted, allocate a `mission-id` of the form `m-YYYYMMDD-<slug>` (e.g. `m-20260426-fee-on-transfer`) and write a new mission block to `.teamworks/project.md` with status `approved`, a one-paragraph mission summary, links to each repo spec, and a `repos:` field listing every affected repo's name (matching the `<name>` in `.teamworks/repos/<name>.md`). The `repos:` list is canonical: `apply` reads it to know who to dispatch.
+- Once every repo spec is accepted, allocate a `mission-id` of the form `m-YYYYMMDD-<slug>` (e.g. `m-20260426-fee-on-transfer`) and write the mission in two places:
+  1. Append a new row to the `## Missions` table in `.teamworks/project.md`: `| <mission-id> | approved | <one-line description> | [<repo>, <repo>] | missions/<mission-id>.md |`. The description must be a single line with no pipe (`|`) characters. The `repos` cell is the canonical dispatch list (names match the `<name>` in `.teamworks/repos/<name>.md`).
+  2. Create `.teamworks/missions/<mission-id>.md` containing the full mission body: `mission-id`, `description`, `repos: [...]`, `created: YYYY-MM-DD HH:MM UTC`, and a `specs:` block listing each repo's spec path. Do NOT write a `status:` line into the detail file — the table cell in `project.md` is the single source of truth for status; duplicating it in the detail file would create a drift hazard. Do NOT add `applied-summary:` here either; that line is appended by `/teamworks:shutdown` after a successful `apply`.
+- Both writes must succeed or neither — if you cannot write the detail file, do NOT add the table row.
 - If interfaces change, update `.teamworks/topology.md` (both diagram and edge table).
-- Report the mission id and per-repo spec paths to the user. No user gate.
+- Report the mission id, the table-row-written confirmation, the detail-file path, and per-repo spec paths to the user. No user gate.
 
 ### `apply`
 
 - Invoked when the user runs `/teamworks:apply <mission-id>`.
-- Load the mission from `.teamworks/project.md`. If status is not `approved`, refuse and tell the user.
-- Determine the dispatch set from the mission block's `repos:` list. If the field is missing (legacy mission), fall back to deriving repo names from the spec paths recorded in the mission block.
+- Find the mission's row in `.teamworks/project.md`'s `## Missions` table. If no row matches the id, refuse and tell the user. If the row's `status` cell is not `approved`, refuse and tell the user.
+- Load the full mission body from `.teamworks/missions/<mission-id>.md` (the `detail` cell of the row gives the path relative to `.teamworks/`). The detail file's `repos:` field is the canonical dispatch set; its `specs:` block lists each manager's approved spec path.
 - Dispatch those repo-managers in parallel with `Phase: apply`. Each manager runs TDD per its approved spec. Managers do not commit.
 - On any `blocked` / `partial` reply, apply the retry policy: formulate a new angle, re-dispatch, up to 3 times.
 - When all managers stop (success or cap), report per-repo status to the user: which files changed, which tests pass / fail, which managers blocked. Hand the working tree to the user; the user owns commit / push.
-- Mark the mission `applied` in `.teamworks/project.md` only if every manager reported `done`. Otherwise leave it `approved` so the user can intervene and re-run `apply`.
+- Mark the mission `applied` ONLY if every manager reported `done`. The status flip is a single-cell edit on the row in `project.md`'s table: change `approved` to `applied`. The table cell is the single source of truth — the detail file does NOT carry a `status:` line and must not be edited in `apply`. (`/teamworks:shutdown` later appends `applied-summary` to the detail file as a separate concern.) Otherwise leave the row's status as `approved` so the user can intervene and re-run `apply`.

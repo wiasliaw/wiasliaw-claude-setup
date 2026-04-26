@@ -43,49 +43,61 @@ If the directory is missing, stop and tell the user to run
 If the user did not supply a `<mission-id>`, ask for one and stop
 until they reply. Do not invent a mission-id on the user's behalf.
 
-The mission must be present in `.teamworks/project.md` AND its status
-must be `approved`. Search the mission block and confirm both with an
-exact-match parser (substring matches would collide on prefix-shared
-mission-ids such as `m-20260426-foo` vs `m-20260426-foo-extra`):
+The mission must have a row in `.teamworks/project.md`'s `## Missions`
+table AND its `status` cell must be `approved`. Parse the table with
+an exact-match parser on the mission-id between `|` delimiters
+(substring matches would collide on prefix-shared mission-ids such as
+`m-20260426-foo` vs `m-20260426-foo-extra`):
 
 ```bash
-awk -v id="<mission-id>" '
-  $0 == "mission-id: " id { found=1; block=1; next }
-  block && /^mission-id: / { block=0 }
-  block && /^status: / { print; status_seen=1; exit }
-  END {
-    if (!found) print "missing"
-    else if (!status_seen) print "no-status"
+ROW=$(awk -v id="<mission-id>" -F'|' '
+  # Skip header row, separator row, and section title.
+  # Data rows start with a leading "|" and have id in column 2.
+  /^\|/ {
+    cell = $2
+    gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+    if (cell == id) { print; exit }
   }
-' .teamworks/project.md
+' .teamworks/project.md)
+
+if [ -z "$ROW" ]; then
+  echo missing
+else
+  # Extract status (column 3) and detail path (column 6).
+  STATUS=$(printf '%s\n' "$ROW" | awk -F'|' '{
+    s = $3; gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); print s
+  }')
+  DETAIL=$(printf '%s\n' "$ROW" | awk -F'|' '{
+    d = $6; gsub(/^[[:space:]]+|[[:space:]]+$/, "", d); print d
+  }')
+  printf 'status: %s\ndetail: %s\n' "$STATUS" "$DETAIL"
+fi
 ```
 
 Decision rules:
 
-- If the parser prints `missing`, the mission-id is not in
-  `.teamworks/project.md`; refuse with a clear error: `mission
+- If the parser prints `missing`, the mission-id has no row in the
+  `## Missions` table; refuse with a clear error: `mission
   <mission-id> not found in .teamworks/project.md — run
   /teamworks:propose first`.
-- If the parser prints `no-status`, the mission block exists but has
-  no `status:` line (malformed block); refuse with: `mission
-  <mission-id> block is malformed: no status line found — fix
-  .teamworks/project.md by hand or re-run /teamworks:propose`. Do
-  NOT proceed.
-- If the parser prints `status: <X>` and `<X>` is not `approved`
-  (e.g. `applied` or anything else), refuse with a clear error
-  naming the actual status: `mission <mission-id> has status <X>;
-  apply requires status: approved`. Do NOT downgrade an `applied`
-  mission back to `approved` — tell the user to draft a new mission
-  via `/teamworks:propose` if they need to redo the work.
-- If approved, also confirm the mission has a non-empty `repos:`
-  list (or, for legacy missions, at least one spec path). If the
-  `repos:` list is empty / missing AND no spec paths are recorded,
-  refuse: `mission <mission-id> has no affected repos; nothing to
-  apply`. (Strict propose semantics from Task 8 should prevent this,
-  but check defensively.)
-- On pass, note the mission's `repos:` list and spec paths so you can
-  cross-check team-lead's report later. Do not pass them in the
-  payload — team-lead reads them itself from `.teamworks/project.md`.
+- If the row is found but the `status` cell is empty or absent,
+  refuse: `mission <mission-id> row is malformed: no status cell —
+  fix .teamworks/project.md by hand or re-run /teamworks:propose`.
+  Do NOT proceed.
+- If the `status` cell is not `approved` (e.g. `applied` or anything
+  else), refuse with a clear error naming the actual status:
+  `mission <mission-id> has status <X>; apply requires status:
+  approved`. Do NOT downgrade an `applied` mission back to
+  `approved` — tell the user to draft a new mission via
+  `/teamworks:propose` if they need to redo the work.
+- If approved, confirm the detail file exists at
+  `.teamworks/<DETAIL>` (the path printed by the parser is relative to
+  `.teamworks/`). If the file is missing, refuse: `mission
+  <mission-id> detail file not found at <path>; re-run
+  /teamworks:propose to recreate it`.
+- On pass, note the detail file path so team-lead can read it. Do not
+  read the file yourself in this step — team-lead loads it from the
+  payload.
 
 ## Step 4: Spawn team-lead and dispatch (Phase: apply)
 
@@ -97,16 +109,17 @@ protocol"). The `Phase` is `apply`. Use this payload shape:
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
-<mission-id>: <one-line summary lifted from the mission block>
+<mission-id>: <one-line summary lifted from the mission's row description in project.md>
 
 ## Phase
 apply
 
 ## Repo Context
-(workspace-level execution — team-lead loads the mission from
-`.teamworks/project.md`, reads its `repos:` field for the canonical
-dispatch set, and falls back to deriving repo names from the recorded
-spec paths only if `repos:` is missing on a legacy mission)
+(workspace-level execution — team-lead reads the mission's row in
+`.teamworks/project.md`'s `## Missions` table to confirm the
+mission-id and status, then loads the full mission body from
+`.teamworks/missions/<mission-id>.md`. The detail file's `repos:`
+field is the canonical dispatch set.)
 
 ## Cross-repo Constraints
 This is the TDD execution phase. Each affected manager runs TDD per
@@ -148,19 +161,27 @@ mission `applied`.
 
 Mission status transition: mark the mission `applied` in
 `.teamworks/project.md` ONLY if every dispatched manager reports
-status `done`. If any manager is `partial` or `blocked` after
-retries, leave the mission as `approved` (do NOT downgrade, do NOT
-mark `applied`). The user will intervene and re-run `apply`.
+status `done`. The status flip is a single-cell edit: change the row's
+`status` cell from `approved` to `applied` in the `## Missions` table.
+The table cell is the single source of truth for mission status; the
+detail file does NOT carry a `status:` line and must not be edited in
+`apply`. (`/teamworks:shutdown` later appends `applied-summary` to the
+detail file as a separate concern.) If any manager is `partial` or
+`blocked` after retries, leave the row's status as `approved` (do NOT
+downgrade, do NOT mark `applied`). The user will intervene and re-run
+`apply`.
 
 ## Task
-Execute mission <mission-id>. Read the mission block from
-`.teamworks/project.md` to get the `repos:` list (or fall back to
-spec paths if `repos:` is missing on a legacy mission) and the spec
-paths. Dispatch the managers for those repos in parallel with
-`Phase: apply` and a `## Task` that points each manager at its own
-approved spec for TDD execution. Synthesise their replies, apply the
-retry policy on failures, and report per-repo status to the outer
-session.
+Execute mission <mission-id>. Read the mission's row in
+`.teamworks/project.md`'s `## Missions` table to confirm the
+mission-id and status, then load the full mission body from
+`.teamworks/missions/<mission-id>.md`. The detail file's `repos:`
+field is the canonical dispatch list and its `specs:` block lists the
+per-repo spec paths. Dispatch the managers for those repos in
+parallel with `Phase: apply` and a `## Task` that points each manager
+at its own approved spec for TDD execution. Synthesise their replies,
+apply the retry policy on failures, and report per-repo status to the
+outer session.
 
 ## Expected Reply
 - mission-id: <mission-id>

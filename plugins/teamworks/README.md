@@ -46,7 +46,7 @@ repo-manager x N (per-command spawn, one per repo)
 | `/teamworks:add-repo` | Register a new repo. Spawns `team-lead`, which writes `.teamworks/repos/<name>.md` and updates `topology.md`. |
 | `/teamworks:add-agent` | Register a project-scoped specialty agent (e.g. `security-reviewer`, `qa`) under `.claude/agents/` and record it in `project.md`. |
 | `/teamworks:explore` | Ask `team-lead` a question. Read-only against `.teamworks/`; dispatches managers in parallel for investigation. |
-| `/teamworks:propose` | Run cross-repo SDD via OpenSpec. `team-lead` dispatches managers, self-approves their specs, allocates a `mission-id`, and writes a mission block to `project.md`. |
+| `/teamworks:propose` | Run cross-repo SDD via OpenSpec. `team-lead` dispatches managers, self-approves their specs, allocates a `mission-id`, appends a row to the `## Missions` table in `project.md`, and writes the full mission body to `.teamworks/missions/<mission-id>.md`. |
 | `/teamworks:apply` | Execute an approved mission. Managers run TDD per their approved spec; no commits. Retries up to 3 times on failure with a new angle. |
 | `/teamworks:shutdown` | Reap stray Team agents, append today's `log/` summary, and append a session summary to `project.md` if needed. Preserves `.teamworks/`. |
 
@@ -65,10 +65,12 @@ my-project/                      # not a git repo; pure workspace
     agents/                      # team-lead.md, repo-manager.md (plugin-bundled)
                                  # plus specialty agents added via /add-agent
   .teamworks/
-    project.md                   # mission, decisions, settings (e.g. max-retries)
+    project.md                   # workspace mission, settings, ## Missions index table
     topology.md                  # ASCII art + edge table (single source)
     repos/
       <name>.md                  # per-repo identity card (static + current role)
+    missions/
+      <mission-id>.md            # one detail file per mission (full body, specs, applied-summary)
     log/
       YYYY-MM-DD.md              # append-only agent interaction log
   token-contract/                # independent git repos

@@ -1,17 +1,18 @@
 ---
 allowed-tools: Bash, Read, Write, TeamCreate, TeamDelete
-description: Reap stray Team agents, append today's log summary, and append a session summary to project.md if the latest mission lacks one. Preserves .teamworks/.
+description: Reap stray Team agents, append today's log summary, and append a session summary to the latest applied mission's detail file if it lacks one. Preserves .teamworks/.
 ---
 
 Announce: "Using teamworks:shutdown to close the workspace session."
 
 The slash command syntax is `/teamworks:shutdown` and takes no
 arguments. This command does NOT spawn `team-lead`; it operates
-directly on `.teamworks/log/` and `.teamworks/project.md` from the
-outer session. It is one of two commands (alongside `/teamworks:init`)
-that touches files without going through `team-lead`. It also does NOT
-use `SendMessage`. `TeamCreate` is listed in `allowed-tools` for
-parity with the other team-spawning commands but is not invoked here.
+directly on `.teamworks/log/` and `.teamworks/missions/<id>.md` from
+the outer session. It is one of two commands (alongside
+`/teamworks:init`) that touches files without going through
+`team-lead`. It also does NOT use `SendMessage`. `TeamCreate` is
+listed in `allowed-tools` for parity with the other team-spawning
+commands but is not invoked here.
 
 This command performs no git operations; the user owns git.
 
@@ -103,39 +104,67 @@ newline).
 
 Append-only; never rewrite earlier log entries.
 
-## Step 5: Top up `.teamworks/project.md`
+## Step 5: Top up the latest applied mission's detail file
 
-Read `.teamworks/project.md` and locate the latest mission block under
-`## Missions` (the last entry in the section). Apply this conservative
-rule:
+Read `.teamworks/project.md` and scan its `## Missions` table for the
+latest row whose `status` cell is `applied`. "Latest" means the last
+such row in document order — the table is append-only by `propose`, so
+the bottom row is the most recent. Then read that row's `detail` cell
+to get the path to the per-mission detail file. Apply this
+conservative rule:
 
-- If there is no mission block at all, skip.
-- If the latest mission's `status:` line is `approved` (not yet
-  applied), skip — the session ended without completing the mission;
-  do not paper over that.
-- If the latest mission's `status:` line is `applied` AND the last
-  non-blank line of that mission block already starts with the exact
-  prefix `applied-summary: `, skip — it has been topped up before.
-  (Use exact prefix; do not accept any other "trailing summary" — too
-  permissive.)
-- If the latest mission is `applied` AND its last non-blank line does
-  not start with `applied-summary: `, append exactly one short line
-  to the end of that mission block. Compute the timestamp inline and
-  append in a single shell invocation so no variable needs to survive
-  across separate code blocks:
+- If there is no row in the table at all (only the header + separator),
+  skip.
+- If no row has `status` cell `applied` (every mission is still
+  `approved`), skip — the session ended without completing any
+  mission; do not paper over that.
+- If the latest `applied` row's detail file does not exist on disk,
+  skip — surface this in the confirmation as `skipped — detail file
+  missing` so the user can investigate. Never recreate the file.
+- If the detail file already contains a line starting with the exact
+  prefix `applied-summary: ` (anywhere in the file), skip — it has
+  been topped up before. Use exact prefix; do not accept any other
+  "trailing summary" — too permissive.
+- Otherwise, append exactly one short line to the end of the detail
+  file. Compute the timestamp inline and append in a single shell
+  invocation:
 
   ```bash
+  DETAIL=".teamworks/<detail-cell-from-row>"   # e.g. .teamworks/missions/m-20260426-fee.md
   APPLIED_AT=$(date -u +"%F %H:%M")
-  printf 'applied-summary: session ended at %s UTC\n' "$APPLIED_AT" >> .teamworks/project.md
+  printf 'applied-summary: session ended at %s UTC\n' "$APPLIED_AT" >> "$DETAIL"
   ```
 
-  Do not edit anything else in `project.md`; do not touch any earlier
-  mission block. This relies on the invariant from `init.md` that
-  `## Missions` is the final section of `project.md`.
+  Do not edit `project.md` in this step. Do not edit anything else in
+  the detail file beyond appending this single line. Do not touch
+  earlier missions' detail files.
 
-If you are not certain which line is the end of the latest mission
-block, prefer to skip rather than edit. This step is best-effort and
-must never corrupt the file.
+Locate the latest applied row with an awk parser over the table that
+extracts mission-id (column 2) and detail (column 6) from each data
+row, keeps the last row whose status cell (column 3) equals `applied`,
+and prints the detail path:
+
+```bash
+LATEST=$(awk -F'|' '
+  /^\|/ {
+    id = $2; gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
+    st = $3; gsub(/^[[:space:]]+|[[:space:]]+$/, "", st)
+    dt = $6; gsub(/^[[:space:]]+|[[:space:]]+$/, "", dt)
+    # Skip the header row (id == "mission-id") and separator (id starts with "-").
+    if (id == "mission-id" || id ~ /^-+$/ || id == "") next
+    if (st == "applied") { last_id = id; last_detail = dt }
+  }
+  END { if (last_id != "") printf "%s\t%s\n", last_id, last_detail }
+' .teamworks/project.md)
+```
+
+If `$LATEST` is empty, skip. Otherwise the first tab-separated field
+is the mission-id (for the confirmation line) and the second is the
+detail path relative to `.teamworks/`.
+
+If you are not certain which row is the latest applied row, prefer to
+skip rather than edit. This step is best-effort and must never corrupt
+the detail file.
 
 ## Step 6: Print confirmation
 
@@ -145,7 +174,7 @@ Print a short confirmation listing exactly what was done, for example:
 shutdown complete:
 - agents reaped: <N> (or "none")
 - log appended: .teamworks/log/<DATE>.md (or "skipped — no log today")
-- project.md: applied-summary added to <mission-id> (or "skipped")
+- mission detail: applied-summary added to missions/<mission-id>.md (or "skipped")
 .teamworks/ is preserved.
 ```
 
