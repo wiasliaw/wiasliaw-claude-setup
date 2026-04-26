@@ -13,6 +13,6 @@ Invoke the autoresearch:research-design skill.
 
 Save to .autoresearch/<research-id>/
 
-If the skill is unavailable, read the SKILL.md at the plugin's `skills/research-design/` directory for full methodology.
+If the skill is unavailable, read `plugins/autoresearch/skills/research-design/SKILL.md` for full methodology.
 
 **User's specification (if any):** $ARGUMENTS

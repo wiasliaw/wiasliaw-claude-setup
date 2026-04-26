@@ -33,21 +33,22 @@ RESEARCH_DIR=.autoresearch/<research-id>
 
 ### Step 2: Gather Data
 
-Read ALL available inputs. The report must be fully self-contained.
+Read every input that `program.md` permits. The report must be fully self-contained, but `program.md` is authoritative on what may be read — if it forbids a file, do not read it; instead, note the omission in the report.
 
-- `$RESEARCH_DIR/program.md` (REQUIRED — drives report structure)
+- `$RESEARCH_DIR/program.md` (REQUIRED — drives report structure and any read restrictions)
 - `$RESEARCH_DIR/draft.md` (REQUIRED — primary content source)
 - `$RESEARCH_DIR/results.tsv` (score tracking)
 - Git history for the session
-- Every file in `$RESEARCH_DIR/rounds/` directories
-- `feedback-summary.md` if it exists
+- Every file in `$RESEARCH_DIR/rounds/` not excluded by program.md
+- `$RESEARCH_DIR/feedback-summary.md` if it exists
 
 ```text
 BEFORE PROCEEDING TO STEP 3, VERIFY:
-→ Have you read program.md?
+→ Have you read program.md and identified any read restrictions?
 → Have you read draft.md in full?
-→ Have you read every round directory's contents?
-→ Did you skip any files? If so, go back and read them.
+→ Have you read every permitted round directory's contents?
+→ Did you skip any permitted files? If so, go back and read them.
+→ Are any forbidden-by-program.md files noted as omissions to surface in the report?
 ```
 
 ### Step 3: Analyze program.md

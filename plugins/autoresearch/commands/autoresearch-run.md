@@ -14,6 +14,6 @@ Invoke the autoresearch:research-execution skill.
 
 Remind user: run /autoresearch-report to generate report.
 
-If the skill is unavailable, read the SKILL.md at the plugin's `skills/research-execution/` directory for full methodology.
+If the skill is unavailable, read `plugins/autoresearch/skills/research-execution/SKILL.md` for full methodology.
 
 **User's specification (if any):** $ARGUMENTS

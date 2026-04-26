@@ -77,7 +77,7 @@ After each round, apply the Per-Round Verification Gate before proceeding to Eva
 
 ```text
 AFTER EACH ROUND, VERIFY:
-→ Did all agents produce output?
+→ Did every agent either produce output or have its skip explicitly logged in results.tsv per Error Recovery?
 → Was draft.md updated with this round's findings?
 → Was results.tsv appended with this round's data?
 → Does the score computation match program.md's formula?
