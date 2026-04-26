@@ -25,7 +25,6 @@ team-lead (Team agent, per-command spawn)
   - Dispatches in parallel to repo-managers.
   - May spawn specialty agents registered under
     $project/.claude/agents/.
-  - May use Task internally for narrow research.
     |
     | SendMessage (parallel)
     v
@@ -33,7 +32,6 @@ repo-manager x N (per-command spawn, one per repo)
   - Owns its repo entirely (read + write).
   - Runs SDD (openspec) and TDD inside the repo.
   - May SendMessage other managers directly.
-  - May use Task internally to keep its context clean.
   - Never reads or writes another repo's files.
   - Never runs git commit / push.
 ```
@@ -48,7 +46,7 @@ repo-manager x N (per-command spawn, one per repo)
 | `/teamworks:explore` | Ask `team-lead` a question. Read-only against `.teamworks/`; dispatches managers in parallel for investigation. |
 | `/teamworks:propose` | Run cross-repo SDD via OpenSpec. `team-lead` dispatches managers, self-approves their specs, allocates a `mission-id`, appends a row to the `## Missions` table in `project.md`, and writes the full mission body to `.teamworks/missions/<mission-id>.md`. |
 | `/teamworks:apply` | Execute an approved mission. Managers run TDD per their approved spec; no commits. Retries up to 3 times on failure with a new angle. |
-| `/teamworks:shutdown` | Reap stray Team agents, append today's `log/` summary, and append a session summary to `project.md` if needed. Preserves `.teamworks/`. |
+| `/teamworks:shutdown` | Reap stray Team agents, append today's `log/` summary, and top up the latest applied mission's detail file under `.teamworks/missions/` if needed. Preserves `.teamworks/`. |
 
 ## Agents
 

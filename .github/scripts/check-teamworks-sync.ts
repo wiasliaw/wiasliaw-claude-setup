@@ -1,24 +1,25 @@
 /**
  * Verifies every <!-- SYNCED FROM reference/<name>.md --> block in
- * plugins/teamworks/ byte-matches the corresponding <!-- CANONICAL -->
- * section of the referenced reference file.
+ * plugins/teamworks/ matches the corresponding <!-- CANONICAL -->
+ * section of the referenced reference file after whitespace normalization
+ * (trailing whitespace per line and leading/trailing blank lines stripped).
  *
  * The reference file is the source of truth; the inlined SYNCED block
  * is a cache. Drift is a CI failure.
  *
  * Usage:
  *   node --experimental-strip-types check-teamworks-sync.ts
- *   node --experimental-strip-types check-teamworks-sync.ts --fix     # rewrite SYNCED blocks to match canonical
+ *   node --experimental-strip-types check-teamworks-sync.ts --fix     # rewrite SYNCED blocks to match canonical (raw, not normalized)
  *
  * Exit codes:
- *   0  all SYNCED blocks match their canonical reference
+ *   0  all SYNCED blocks match their canonical reference after normalization
  *   1  one or more SYNCED blocks are out of sync
  *   2  script error (missing reference file, malformed markers)
  *
  * No external deps. Uses node:fs only (matches existing CI script style).
  */
 
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 

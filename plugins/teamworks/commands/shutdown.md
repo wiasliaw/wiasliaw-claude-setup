@@ -114,7 +114,7 @@ Filled-in shell that emits one line in that shape:
 ```bash
 if [ -f "$LOG" ]; then
   N=$(grep -c '' "$LOG")
-  printf '[%s] [shutdown -> session] session ended; %s entries this session\n' "$TIME" "$N" >> "$LOG"
+  printf '[%s] [shutdown -> session] session ended; %s lines in today'"'"'s log\n' "$TIME" "$N" >> "$LOG"
 fi
 ```
 

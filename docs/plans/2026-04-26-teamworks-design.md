@@ -193,10 +193,7 @@ spawns them on demand during `propose` / `apply` / `explore`.
 <mission-id>: <one-line summary>
 
 ## Phase
-propose | apply | explore | onboard
-
-## Repo Context
-<paste contents of .teamworks/repos/<this>.md>
+propose | apply | explore | onboard | query
 
 ## Cross-repo Constraints
 <relevant slice of topology.md, e.g. "Your ABI is consumed by indexer.">
@@ -209,6 +206,10 @@ propose | apply | explore | onboard
 - summary: <bullets>
 - blockers: <if any>
 ```
+
+The dispatch payload no longer carries `## Repo Context`; receivers read
+their own `.teamworks/repos/<name>.md` from disk. See
+`plugins/teamworks/reference/dispatch-payload.md` for the canonical schema.
 
 ### SendMessage reply (repo-manager -> team-lead)
 
@@ -287,16 +288,18 @@ touches an interface updates both.
 
 ### `propose`
 
-1. team-lead reads `.teamworks/{project,topology}.md` and every
-   `repos/<name>.md`.
-2. team-lead identifies affected repos.
-3. team-lead dispatches in parallel: each affected manager runs openspec
+1. team-lead reads `.teamworks/{project,topology}.md`.
+2. team-lead uses `topology.md` to identify candidate repos relevant to
+   the requested change.
+3. team-lead reads only the candidate `repos/<name>.md` identity cards
+   and confirms the affected repos.
+4. team-lead dispatches in parallel: each affected manager runs openspec
    inside its repo and replies with the spec path and a summary.
-4. team-lead reviews and self-approves each repo spec.
-5. team-lead writes a new `mission` block to `project.md` with a
+5. team-lead reviews and self-approves each repo spec.
+6. team-lead writes a new `mission` block to `project.md` with a
    `mission-id`, marks it `approved`, and updates `topology.md` if
    interfaces change.
-6. team-lead reports the mission to the user. No user gate.
+7. team-lead reports the mission to the user. No user gate.
 
 ### `apply`
 
@@ -335,10 +338,11 @@ touches an interface updates both.
 
 1. Outer session enumerates live Team agents associated with this
    workspace and tears them down.
-2. Outer session appends a one-line summary to today's `log/` if any
-   activity is unrecorded.
-3. Outer session appends a session summary to `project.md` if the latest
-   mission lacks one.
+2. Outer session appends a one-line shutdown entry to today's
+   `.teamworks/log/<DATE>.md` to mark session end.
+3. If the latest `applied` mission's detail file under
+   `.teamworks/missions/` lacks an `applied-summary:` line, outer
+   session appends one. `project.md` is not modified by shutdown.
 4. `.teamworks/` is preserved.
 
 ## Out of Scope (YAGNI)

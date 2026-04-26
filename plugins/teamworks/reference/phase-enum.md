@@ -26,4 +26,4 @@ This is a closed enum; do not add new phase values without updating this file, e
 
 ## Notes
 
-- Inlined copies live in: team-lead.md (Dispatch protocol), repo-manager.md (cross-manager outgoing).
+- No SYNCED inlines exist for this enum today. team-lead.md and repo-manager.md reference the phase values prosaically (e.g. `propose | apply | explore | onboard | query`); if a future change needs the full enum table inlined, add a SYNCED block referencing this file and update this note.
