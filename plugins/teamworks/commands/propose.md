@@ -11,6 +11,16 @@ describing the cross-repo change. `propose` allocates a new
 `mission-id` and writes the mission block to `.teamworks/project.md`;
 no user gate sits between `propose` and `apply`.
 
+## Step 0: Confirm working directory
+
+Run `pwd` and confirm with the user that the current directory is the
+intended workspace root (the folder containing `.teamworks/`). If
+unsure, stop and ask.
+
+```bash
+pwd
+```
+
 ## Step 1: Announce
 
 Print the announce line above, substituting the actual `<description>`

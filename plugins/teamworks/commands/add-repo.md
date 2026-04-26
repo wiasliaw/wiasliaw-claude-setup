@@ -9,6 +9,16 @@ The slash command syntax is `/teamworks:add-repo <path>`. If the user
 did not provide `<path>`, ask for it and stop. If `<path>` is relative,
 resolve it to an absolute path before passing it to team-lead.
 
+## Step 0: Confirm working directory
+
+Run `pwd` and confirm with the user that the current directory is the
+intended workspace root (the folder containing `.teamworks/`). If
+unsure, stop and ask.
+
+```bash
+pwd
+```
+
 ## Step 1: Announce
 
 Print the announce line above, substituting the actual `<path>` the

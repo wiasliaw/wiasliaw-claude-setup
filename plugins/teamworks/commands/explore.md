@@ -10,6 +10,16 @@ The slash command syntax is `/teamworks:explore <question>`. The
 not have to be a single line). `explore` is not a mission, so no
 `mission-id` is involved.
 
+## Step 0: Confirm working directory
+
+Run `pwd` and confirm with the user that the current directory is the
+intended workspace root (the folder containing `.teamworks/`). If
+unsure, stop and ask.
+
+```bash
+pwd
+```
+
 ## Step 1: Announce
 
 Print the announce line above, substituting the actual `<question>` the

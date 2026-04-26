@@ -12,6 +12,16 @@ statement that anchors the agent's system prompt.
 `$project` in this command refers to the workspace folder — the cwd of
 the outer session, the same directory that holds `.teamworks/`.
 
+## Step 0: Confirm working directory
+
+Run `pwd` and confirm with the user that the current directory is the
+intended workspace root (the folder containing `.teamworks/`). If
+unsure, stop and ask.
+
+```bash
+pwd
+```
+
 ## Step 1: Announce
 
 Print the announce line above, substituting the actual `<role>` the user

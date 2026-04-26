@@ -11,6 +11,16 @@ The slash command syntax is `/teamworks:apply <mission-id>`. The
 run. `apply` does NOT execute any git operations — the user owns
 commit, push, and every other git write from here.
 
+## Step 0: Confirm working directory
+
+Run `pwd` and confirm with the user that the current directory is the
+intended workspace root (the folder containing `.teamworks/`). If
+unsure, stop and ask.
+
+```bash
+pwd
+```
+
 ## Step 1: Announce
 
 Print the announce line above, substituting the actual `<mission-id>`
