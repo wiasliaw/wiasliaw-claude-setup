@@ -4,6 +4,9 @@ The structured SendMessage payload that team-lead sends to a repo-manager (and t
 
 ## Template
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin MUST byte-match it. Customisation (specific Phase value, filled-in Task prose, etc.) belongs OUTSIDE the SYNCED block in the consumer file (typically as a follow-up "fill in like:" example without sync markers).
+
+<!-- CANONICAL -->
 ```markdown
 ## Mission
 <mission-id>: <one-line summary>
@@ -23,6 +26,7 @@ propose | apply | explore | onboard | query
 - summary: <bullets>
 - blockers: <if any>
 ```
+<!-- /CANONICAL -->
 
 ## Notes
 

@@ -4,9 +4,13 @@ Every Team-side actor (team-lead, every repo-manager, the outer session for shut
 
 ## Format
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin MUST byte-match it. Concrete shell snippets that USE this format (e.g. shutdown.md's `printf` command) are NOT inside SYNCED markers; only the format string itself is canonical.
+
+<!-- CANONICAL -->
 ```text
 [HH:MM] [<from> -> <to>] <one-line summary>
 ```
+<!-- /CANONICAL -->
 
 - `HH:MM` is UTC time, 24-hour.
 - `<from>` and `<to>` are agent identifiers (e.g. `team-lead`, `repo-manager:indexer`, `shutdown`, `session`).

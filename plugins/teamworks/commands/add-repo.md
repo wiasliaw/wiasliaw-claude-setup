@@ -79,6 +79,31 @@ protocol"):
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
+<mission-id>: <one-line summary>
+
+## Phase
+propose | apply | explore | onboard | query
+
+## Cross-repo Constraints
+<topology slice and any phase-specific constraints>
+(omit if Phase: query)
+
+## Task
+<concrete instructions>
+
+## Expected Reply
+- artifact-paths: [<files-or-dirs>]
+- summary: <bullets>
+- blockers: <if any>
+```
+<!-- /SYNCED -->
+
+Fill it in like this for `add-repo` (note: this is a filled example,
+not a sync-tracked block — substitute `<name>` (the repo's directory
+basename), `<absolute-path>`, and `<reason>` before sending):
+
+```markdown
+## Mission
 add-repo: register <name> into the workspace
 
 ## Phase
@@ -108,10 +133,6 @@ Per your `add-repo` behaviour:
   role in the workspace
 - blockers: any clarifying questions or unresolved issues
 ```
-<!-- /SYNCED -->
-
-Substitute `<name>` (the repo's directory basename), `<absolute-path>`,
-and `<reason>` before sending.
 
 ## Step 5: Wait for team-lead's report and forward verbatim
 

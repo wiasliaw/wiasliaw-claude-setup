@@ -4,6 +4,9 @@ The `Phase` field in a dispatch payload MUST be exactly one of these five values
 
 ## Closed enumeration
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin (currently none; reserved for future use) MUST byte-match it.
+
+<!-- CANONICAL -->
 | Value | Direction | Used by |
 |---|---|---|
 | `propose` | team-lead -> repo-manager | /teamworks:propose |
@@ -11,6 +14,7 @@ The `Phase` field in a dispatch payload MUST be exactly one of these five values
 | `explore` | team-lead -> repo-manager | /teamworks:explore |
 | `onboard` | team-lead -> repo-manager | /teamworks:add-repo, /teamworks:add-agent |
 | `query` | repo-manager -> repo-manager (cross-manager only) | repo-manager spontaneously |
+<!-- /CANONICAL -->
 
 ## Receiver behaviour
 

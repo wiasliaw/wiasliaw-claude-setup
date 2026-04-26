@@ -4,6 +4,9 @@
 
 ## Format
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin (currently none; reserved for future use) MUST byte-match it.
+
+<!-- CANONICAL -->
 ```markdown
 # <repo-name>
 
@@ -17,6 +20,7 @@
 - Mission: <description of current cross-repo work or "(none active)">
 - Responsibilities: <one paragraph or bullets describing this repo's role>
 ```
+<!-- /CANONICAL -->
 
 ## Constraints
 

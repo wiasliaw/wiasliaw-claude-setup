@@ -9,6 +9,9 @@ This split bounds `project.md` size: the table grows ~1 row per mission, and ful
 
 ## v2 Table Row Format
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin MUST byte-match it. Prose around the canonical block (constraints, writers, parsers) is reference-only and is NOT inlined.
+
+<!-- CANONICAL -->
 The `## Missions` section in `project.md` is a markdown table:
 
 ```markdown
@@ -17,15 +20,6 @@ The `## Missions` section in `project.md` is a markdown table:
 |---|---|---|---|---|
 | m-YYYYMMDD-<slug> | approved \| applied | <one-line description> | [<repo>, <repo>] | missions/<mission-id>.md |
 ```
-
-Constraints:
-- mission-id: kebab-case slug, no spaces, format `m-YYYYMMDD-<slug>`.
-- status: exactly one of `approved` or `applied`.
-- description: ONE LINE. Must not contain pipe (`|`) characters; replace with `/` or `,` if needed.
-- repos: JSON-style list `[name, name]`. Repo names match `<name>` in `.teamworks/repos/<name>.md`.
-- detail: relative path `missions/<mission-id>.md` (relative to `.teamworks/`).
-
-## v2 Detail File Format
 
 Each mission's full content lives at `.teamworks/missions/<mission-id>.md`:
 
@@ -41,6 +35,16 @@ Each mission's full content lives at `.teamworks/missions/<mission-id>.md`:
   - <repo>: <path>
 - applied-summary: session ended at YYYY-MM-DD HH:MM UTC   (added by shutdown when applicable)
 ```
+<!-- /CANONICAL -->
+
+Constraints (table row):
+- mission-id: kebab-case slug, no spaces, format `m-YYYYMMDD-<slug>`.
+- status: exactly one of `approved` or `applied`.
+- description: ONE LINE. Must not contain pipe (`|`) characters; replace with `/` or `,` if needed.
+- repos: JSON-style list `[name, name]`. Repo names match `<name>` in `.teamworks/repos/<name>.md`.
+- detail: relative path `missions/<mission-id>.md` (relative to `.teamworks/`).
+
+## v2 Detail File Format
 
 Status is deliberately NOT in the detail file. The single source of truth for a mission's status is the `status` cell of its row in `project.md`'s `## Missions` table — duplicating it in the detail file would create a drift hazard. `apply` flips the table cell; `shutdown` only appends `applied-summary` to the detail file. Neither writes a `status:` line into the detail file.
 

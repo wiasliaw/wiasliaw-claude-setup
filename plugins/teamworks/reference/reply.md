@@ -4,6 +4,9 @@ The structured response that repo-manager sends back to team-lead (or to a peer 
 
 ## Template
 
+The block between `<!-- CANONICAL -->` markers below is the source of truth — every SYNCED inline elsewhere in the plugin MUST byte-match it.
+
+<!-- CANONICAL -->
 ```markdown
 ## Status
 done | partial | blocked
@@ -20,6 +23,7 @@ done | partial | blocked
 ## Next-step suggestion (optional)
 - <manager's suggestion>
 ```
+<!-- /CANONICAL -->
 
 ## Notes
 

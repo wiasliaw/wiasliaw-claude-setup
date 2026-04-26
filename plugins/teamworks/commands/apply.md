@@ -121,6 +121,31 @@ protocol"). The `Phase` is `apply`. Use this payload shape:
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
+<mission-id>: <one-line summary>
+
+## Phase
+propose | apply | explore | onboard | query
+
+## Cross-repo Constraints
+<topology slice and any phase-specific constraints>
+(omit if Phase: query)
+
+## Task
+<concrete instructions>
+
+## Expected Reply
+- artifact-paths: [<files-or-dirs>]
+- summary: <bullets>
+- blockers: <if any>
+```
+<!-- /SYNCED -->
+
+Fill it in like this for `apply` (note: this is a filled example, not
+a sync-tracked block — substitute the real `<mission-id>` and the
+one-line mission summary before sending):
+
+```markdown
+## Mission
 <mission-id>: <one-line summary lifted from the mission's row description in project.md>
 
 ## Phase
@@ -207,10 +232,6 @@ outer session.
 - blockers: <aggregate blockers across repos, if any>
 - next-step: "user owns git from here" (always include this line)
 ```
-<!-- /SYNCED -->
-
-Substitute the real `<mission-id>` and the one-line mission summary
-before sending.
 
 ## Step 4.5: Append mission sub-anchor to today's log
 

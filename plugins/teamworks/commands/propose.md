@@ -70,6 +70,31 @@ protocol"). The `Phase` is `propose`. Use this payload shape:
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
+<mission-id>: <one-line summary>
+
+## Phase
+propose | apply | explore | onboard | query
+
+## Cross-repo Constraints
+<topology slice and any phase-specific constraints>
+(omit if Phase: query)
+
+## Task
+<concrete instructions>
+
+## Expected Reply
+- artifact-paths: [<files-or-dirs>]
+- summary: <bullets>
+- blockers: <if any>
+```
+<!-- /SYNCED -->
+
+Fill it in like this for `propose` (note: this is a filled example,
+not a sync-tracked block — substitute the one-line summary and the
+verbatim description before sending):
+
+```markdown
+## Mission
 Propose: <one-line summary of description>
 
 ## Phase
@@ -178,10 +203,6 @@ Per your `propose` behaviour:
 - summary: <one paragraph describing the proposed mission>
 - blockers: <if any manager replied partial / blocked>
 ```
-<!-- /SYNCED -->
-
-Substitute the one-line summary and the verbatim description before
-sending.
 
 ## Step 5: Wait for team-lead's report and forward verbatim
 

@@ -64,6 +64,30 @@ the read-only nature of the investigation in multiple places:
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
+<mission-id>: <one-line summary>
+
+## Phase
+propose | apply | explore | onboard | query
+
+## Cross-repo Constraints
+<topology slice and any phase-specific constraints>
+(omit if Phase: query)
+
+## Task
+<concrete instructions>
+
+## Expected Reply
+- artifact-paths: [<files-or-dirs>]
+- summary: <bullets>
+- blockers: <if any>
+```
+<!-- /SYNCED -->
+
+Fill it in like this for `explore` (note: this is a filled example, not
+a sync-tracked block — substitute values before sending):
+
+```markdown
+## Mission
 Explore: <one-line summary of the question>
 
 ## Phase
@@ -96,7 +120,6 @@ Synthesise the managers' replies into a single answer for the user.
 - per-repo notes: short bullet per repo you consulted, if applicable
 - blockers: any unresolved questions or repos you could not answer for
 ```
-<!-- /SYNCED -->
 
 Substitute the one-line summary and the verbatim question before
 sending.

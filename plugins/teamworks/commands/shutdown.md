@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash, Read, Write, TeamCreate, TeamDelete
+allowed-tools: Bash, Read, Write, TeamDelete
 description: Reap stray Team agents, append today's log summary, and append a session summary to the latest applied mission's detail file if it lacks one. Preserves .teamworks/.
 ---
 
@@ -11,8 +11,8 @@ directly on `.teamworks/log/` and `.teamworks/missions/<id>.md` from
 the outer session. It is one of two commands (alongside
 `/teamworks:init`) that touches files without going through
 `team-lead`. It also does NOT use `SendMessage`. `TeamCreate` is
-listed in `allowed-tools` for parity with the other team-spawning
-commands but is not invoked here.
+intentionally NOT in `allowed-tools` (least privilege): shutdown only
+reaps existing agents, it never spawns new ones.
 
 This command performs no git operations; the user owns git.
 
@@ -104,13 +104,19 @@ so the synthetic recipient is `session` (the outer session that
 invoked `/teamworks:shutdown`):
 
 <!-- SYNCED FROM reference/log-format.md — edit there, then re-sync here -->
+```text
+[HH:MM] [<from> -> <to>] <one-line summary>
+```
+<!-- /SYNCED -->
+
+Filled-in shell that emits one line in that shape:
+
 ```bash
 if [ -f "$LOG" ]; then
   N=$(grep -c '' "$LOG")
   printf '[%s] [shutdown -> session] session ended; %s entries this session\n' "$TIME" "$N" >> "$LOG"
 fi
 ```
-<!-- /SYNCED -->
 
 `grep -c ''` counts every line including an unterminated final line
 (unlike `wc -l`, which under-counts when the file lacks a trailing

@@ -94,6 +94,31 @@ protocol"):
 <!-- SYNCED FROM reference/dispatch-payload.md — edit there, then re-sync here -->
 ```markdown
 ## Mission
+<mission-id>: <one-line summary>
+
+## Phase
+propose | apply | explore | onboard | query
+
+## Cross-repo Constraints
+<topology slice and any phase-specific constraints>
+(omit if Phase: query)
+
+## Task
+<concrete instructions>
+
+## Expected Reply
+- artifact-paths: [<files-or-dirs>]
+- summary: <bullets>
+- blockers: <if any>
+```
+<!-- /SYNCED -->
+
+Fill it in like this for `add-agent` (note: this is a filled example,
+not a sync-tracked block — substitute `<role>` and `<brief>` before
+sending):
+
+```markdown
+## Mission
 add-agent: register specialty agent <role>
 
 ## Phase
@@ -142,9 +167,6 @@ Do not spawn `<role>` now. Later commands will invoke it on demand.
   registered purpose
 - blockers: any clarifying questions or unresolved issues
 ```
-<!-- /SYNCED -->
-
-Substitute `<role>` and `<brief>` before sending.
 
 ## Step 5: Forward team-lead's report
 
