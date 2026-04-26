@@ -395,4 +395,4 @@ plugins/teamworks/
 ```
 
 The marketplace entry will be added to `.claude-plugin/marketplace.json`,
-sorted alphabetically with `autoresearch` and `engineer`.
+sorted alphabetically with `autoresearch`.

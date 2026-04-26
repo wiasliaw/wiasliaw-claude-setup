@@ -22,8 +22,7 @@ validators in `.github/scripts/`.
 this plan says "per design doc Section X", read that section before
 authoring.
 
-**Conventions to follow:** Mirror the `plugins/engineer/` and
-`plugins/autoresearch/` style:
+**Conventions to follow:** Mirror the `plugins/autoresearch/` style:
 
 - `plugin.json` shape: `{ name, description, author: { name } }`.
 - Commands: `allowed-tools` and `description` in frontmatter; first
@@ -54,7 +53,7 @@ Each task ends with the relevant subset.
 
 - Create: `plugins/teamworks/.claude-plugin/plugin.json`
 - Modify: `.claude-plugin/marketplace.json` (add `teamworks` entry,
-  alphabetically after `engineer`)
+  alphabetically after `autoresearch`)
 
 **Step 1: Create plugin.json**
 
@@ -82,7 +81,7 @@ Append to the `plugins` array in `.claude-plugin/marketplace.json`:
 }
 ```
 
-`teamworks` sorts after `autoresearch` and `engineer`, so just append.
+`teamworks` sorts after `autoresearch`, so just append.
 
 **Step 3: Verify**
 
@@ -629,7 +628,7 @@ git commit -m "feat(teamworks): add shutdown command"
 
 **Step 1: Author README**
 
-Mirror `plugins/engineer/README.md` structure:
+Mirror `plugins/autoresearch/README.md` structure:
 
 - Title and one-paragraph summary.
 - `## Architecture` — three-layer agent topology (lift the diagram
