@@ -127,7 +127,8 @@ rule:
   ```
 
   Do not edit anything else in `project.md`; do not touch any earlier
-  mission block.
+  mission block. This relies on the invariant from `init.md` that
+  `## Missions` is the final section of `project.md`.
 
 If you are not certain which line is the end of the latest mission
 block, prefer to skip rather than edit. This step is best-effort and

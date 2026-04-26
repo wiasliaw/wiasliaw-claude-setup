@@ -49,6 +49,7 @@ user's paragraph for the placeholder:
 (none yet — add via /teamworks:add-agent)
 
 ## Missions
+<!-- INVARIANT: ## Missions must remain the final section of project.md. /teamworks:shutdown appends 'applied-summary:' lines after the latest mission block, which relies on EOF == end-of-last-mission-block. -->
 (none yet — propose via /teamworks:propose)
 ```
 
@@ -79,3 +80,28 @@ Confirm `.teamworks/project.md` and `.teamworks/topology.md` exist and
 that `.teamworks/repos/` and `.teamworks/log/` are empty directories.
 Print a one-line summary and suggest `/teamworks:add-repo <path>` as
 the next step.
+
+## Mission Block Schema
+
+`/teamworks:propose` writes mission blocks to `.teamworks/project.md` under
+the `## Missions` section. `/teamworks:apply` and `/teamworks:shutdown`
+parse them. The block grammar is line-oriented:
+
+- One blank line separates mission blocks.
+- Each block contains these lines, each on its own line, in this order:
+  - `mission-id: m-YYYYMMDD-<slug>` — kebab-case slug, no spaces.
+  - `status: approved | applied` — exactly one of these two.
+  - `description: <one paragraph>` — single line; multi-paragraph
+    descriptions are NOT supported.
+  - `repos: [<repo-name>, <repo-name>, ...]` — JSON-style list of repo
+    names matching `<name>` in `.teamworks/repos/<name>.md`.
+  - `specs:` followed by one indented bullet per spec path:
+    - `  - <repo>: <path-to-spec-artifact>`
+- Optional trailing line (added by `/teamworks:shutdown` when the mission
+  is applied):
+  - `applied-summary: session ended at YYYY-MM-DD HH:MM UTC`
+
+Parsers MUST anchor matches (e.g. `^mission-id: <id>$`, not substring) to
+avoid prefix collisions. Future schema changes require updating
+`/teamworks:propose` (writer), `/teamworks:apply` (parser), and
+`/teamworks:shutdown` (parser/appender) atomically.
